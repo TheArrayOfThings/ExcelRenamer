@@ -249,7 +249,22 @@ namespace MailMerger_V3
         private EmailMessage createEmail(string[] recipientData)
         {
             EmailMessage email = new EmailMessage(service);
-            email.Body = RtfToHtmlConverter.RtfToHtml(bodyBox.Rtf).Html;
+            string htmlBody = RtfToHtmlConverter.RtfToHtml(bodyBox.Rtf).Html;
+            Console.WriteLine(htmlBody);
+            int imageOccurences = StringTools.CountStringOccurrences(htmlBody, "<img");
+            int lastImgOccurence = 0;
+            for (int i = 0; i < imageOccurences; ++i)
+            {
+                int imageIndex = htmlBody.IndexOf("<img");
+                int srcIndex = htmlBody.IndexOf("scr=\"", imageIndex);
+                int srcEnd = htmlBody.IndexOf("/>", srcIndex);
+                int fileNameLength = srcEnd - srcIndex;
+                string fileLocation = htmlBody.Substring(srcIndex, srcEnd);
+
+                //email.Attachments.AddFileAttachment(htmlBody.Substring(srcIndex, srcEnd));
+                //Find img src, attach image to email, replace src with <img src="cid:yourcontentid" />
+            }
+            email.Body = htmlBody;
             email.Subject = subjectBox.Text;
             email.ToRecipients.Add(recipientData[emailColumn]);
             email.From = sendFrom;

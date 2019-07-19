@@ -71,6 +71,7 @@
     <Compile Include="RtfToHtmlConverter.cs" />
     <Compile Include="RtfToPlaintTextConverter.cs" />
     <Compile Include="RtfToXamlConverter.cs" />
+    <Compile Include="StringTools.cs" />
     <Compile Include="XamlToHtmlConverter.cs" />
     <EmbeddedResource Include="MainWindow.resx">
       <DependentUpon>MainWindow.cs</DependentUpon>
