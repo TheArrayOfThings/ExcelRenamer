@@ -68,6 +68,7 @@
             // 
             this.dearBox.Location = new System.Drawing.Point(72, 9);
             this.dearBox.Name = "dearBox";
+            this.dearBox.ReadOnly = true;
             this.dearBox.Size = new System.Drawing.Size(225, 20);
             this.dearBox.TabIndex = 1;
             // 
@@ -84,6 +85,7 @@
             // 
             this.refBox.Location = new System.Drawing.Point(72, 35);
             this.refBox.Name = "refBox";
+            this.refBox.ReadOnly = true;
             this.refBox.Size = new System.Drawing.Size(225, 20);
             this.refBox.TabIndex = 3;
             // 
@@ -100,6 +102,7 @@
             // 
             this.emailBox.Location = new System.Drawing.Point(72, 62);
             this.emailBox.Name = "emailBox";
+            this.emailBox.ReadOnly = true;
             this.emailBox.Size = new System.Drawing.Size(225, 20);
             this.emailBox.TabIndex = 5;
             // 
@@ -136,6 +139,7 @@
             // 
             this.inboxes.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.inboxes.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.inboxes.FormattingEnabled = true;
             this.inboxes.Location = new System.Drawing.Point(441, 9);
             this.inboxes.Name = "inboxes";
@@ -226,6 +230,7 @@
             // 
             // importButton
             // 
+            this.importButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.importButton.Location = new System.Drawing.Point(15, 513);
             this.importButton.Name = "importButton";
             this.importButton.Size = new System.Drawing.Size(75, 23);
@@ -236,6 +241,7 @@
             // 
             // previewButton
             // 
+            this.previewButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.previewButton.Location = new System.Drawing.Point(97, 513);
             this.previewButton.Name = "previewButton";
             this.previewButton.Size = new System.Drawing.Size(75, 23);
@@ -246,6 +252,7 @@
             // 
             // sendButton
             // 
+            this.sendButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.sendButton.Location = new System.Drawing.Point(179, 513);
             this.sendButton.Name = "sendButton";
             this.sendButton.Size = new System.Drawing.Size(75, 23);
@@ -256,6 +263,7 @@
             // 
             // templateButton
             // 
+            this.templateButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.templateButton.Location = new System.Drawing.Point(373, 513);
             this.templateButton.Name = "templateButton";
             this.templateButton.Size = new System.Drawing.Size(75, 23);
@@ -266,6 +274,7 @@
             // 
             // setupButton
             // 
+            this.setupButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.setupButton.Location = new System.Drawing.Point(455, 513);
             this.setupButton.Name = "setupButton";
             this.setupButton.Size = new System.Drawing.Size(75, 23);
@@ -276,6 +285,7 @@
             // 
             // settingsButton
             // 
+            this.settingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.settingsButton.Location = new System.Drawing.Point(536, 512);
             this.settingsButton.Name = "settingsButton";
             this.settingsButton.Size = new System.Drawing.Size(75, 23);
@@ -316,6 +326,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "main";
             this.Text = "Ryan\'s MailMerger V3";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.main_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 
