@@ -17,6 +17,7 @@ namespace MailMerger_V3
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new main());
+            
         }
     }
 }

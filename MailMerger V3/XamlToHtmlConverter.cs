@@ -9,6 +9,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Xml;
+using System.Text.RegularExpressions;
 
 namespace Rtf2Html
 {
@@ -60,7 +61,12 @@ namespace Rtf2Html
 
             if (!WriteFlowDocument(htmlWriter))
                 return;
-            _htmlResult.Html = htmlStringBuilder.ToString();
+            _htmlResult.Html = htmlStringBuilder.ToString().Replace("<p />", "<br/>");
+            _htmlResult.Html = _htmlResult.Html.Replace("<body>", "");
+            _htmlResult.Html = _htmlResult.Html.Replace("</body>", "");
+            _htmlResult.Html = _htmlResult.Html.Replace("<html>", "");
+            _htmlResult.Html = _htmlResult.Html.Replace("</html>", "");
+            _htmlResult.Html = htmlLinkify(_htmlResult.Html);
         }
 
         private static string WrapIntoFlowDocument(string xamlString)
@@ -216,10 +222,10 @@ namespace Rtf2Html
                     // Table/Image attributes
                     // ----------------
                     case "Width":
-                        css = "width:" + _xamlReader.Value + ";";
+                        htmlWriter.WriteAttributeString("width", _xamlReader.Value);
                         break;
                     case "Height":
-                        css = "height:" + _xamlReader.Value + ";";
+                        htmlWriter.WriteAttributeString("height", _xamlReader.Value);
                         break;
                     case "ColumnSpan":
                         htmlWriter.WriteAttributeString("colspan", _xamlReader.Value);
@@ -545,6 +551,41 @@ namespace Rtf2Html
                 stream.CopyTo(memoryStream);
                 return memoryStream.ToArray();
             }
+        }
+        private string htmlLinkify(string workString)
+        {
+            MatchCollection matches = Regex.Matches(workString, ">([^\\s]+) &lt;([^\\s]+)&gt;<\\/span>");
+            string parsedString = workString;
+            string thisMatch = "";
+            for (int i = 0; i < matches.Count; ++i)
+            {
+                thisMatch = ReplaceFirst(matches[i].ToString(), ">", "");
+                thisMatch = thisMatch.Replace("</span>", "");
+                workString = workString.Replace(thisMatch, "<a href=\"" + extractLink(thisMatch) + "\">" + extractLinkName(thisMatch) + "</a>");
+            }
+            return workString;
+        }
+        private string extractLink(string toExtract)
+        {
+            int linkStartIndex = toExtract.IndexOf("&lt;") + 4;
+            int linkEndIndex = toExtract.IndexOf("&gt;");
+            int linkLength = linkEndIndex - linkStartIndex;
+            return toExtract.Substring(linkStartIndex, linkLength);
+        }
+        private string extractLinkName(string toExtract)
+        {
+            int linkEndIndex = toExtract.IndexOf("&lt;");
+            int linkLength = linkEndIndex - 1;
+            return toExtract.Substring(0, linkLength);
+        }
+        private string ReplaceFirst(string searchText, string search, string replace)
+        {
+            int pos = searchText.IndexOf(search);
+            if (pos < 0)
+            {
+                return searchText;
+            }
+            return searchText.Substring(0, pos) + replace + searchText.Substring(pos + search.Length);
         }
     }
 }

@@ -117,22 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="emailMenu.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
-  <data name="logBox.Text" xml:space="preserve">
-    <value>Welcome to Ryan's MailMerger!
+  <data name="instructionsBox.Text" xml:space="preserve">
+    <value>
+Welcome to the MailMerger V3 setup screen.
 
-1): Import your recipient data using the 'Import' button
+Anything added in the 'Signature' box will be automatically added at the end of every email.
 
-2): Add a subject and complete the body
-
-3): Preview before sending
-
-**'Dear [name]' is automatically added!**
-
-**Your signature is automatically added!**
-
+The 'Inboxes' selection is used to add inboxes that you wish to email from.
 </value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />

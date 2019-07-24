@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(main));
             this.dearLabel = new System.Windows.Forms.Label();
             this.dearBox = new System.Windows.Forms.TextBox();
@@ -46,13 +47,19 @@
             this.removeButton = new System.Windows.Forms.Button();
             this.subjectBox = new System.Windows.Forms.TextBox();
             this.bodyBox = new System.Windows.Forms.RichTextBox();
+            this.emailMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.hyperlinkToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.insertImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.logBox = new System.Windows.Forms.RichTextBox();
             this.importButton = new System.Windows.Forms.Button();
             this.previewButton = new System.Windows.Forms.Button();
             this.sendButton = new System.Windows.Forms.Button();
             this.templateButton = new System.Windows.Forms.Button();
-            this.setupButton = new System.Windows.Forms.Button();
             this.settingsButton = new System.Windows.Forms.Button();
+            this.insertMergeFieldToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.emailMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // dearLabel
@@ -159,6 +166,7 @@
             // 
             this.attachments.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.attachments.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.attachments.FormattingEnabled = true;
             this.attachments.Location = new System.Drawing.Point(443, 35);
             this.attachments.Name = "attachments";
@@ -197,34 +205,74 @@
             // 
             // subjectBox
             // 
-            this.subjectBox.Location = new System.Drawing.Point(15, 88);
+            this.subjectBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.subjectBox.Location = new System.Drawing.Point(373, 91);
             this.subjectBox.Name = "subjectBox";
-            this.subjectBox.Size = new System.Drawing.Size(340, 20);
+            this.subjectBox.Size = new System.Drawing.Size(412, 20);
             this.subjectBox.TabIndex = 15;
             this.subjectBox.Text = "[Replace with subject]";
             // 
             // bodyBox
             // 
-            this.bodyBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.bodyBox.Location = new System.Drawing.Point(15, 115);
+            this.bodyBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.bodyBox.ContextMenuStrip = this.emailMenu;
+            this.bodyBox.Location = new System.Drawing.Point(373, 115);
             this.bodyBox.Name = "bodyBox";
-            this.bodyBox.Size = new System.Drawing.Size(340, 391);
+            this.bodyBox.Size = new System.Drawing.Size(412, 391);
             this.bodyBox.TabIndex = 16;
             this.bodyBox.Text = "[Replace with body of email]";
             // 
+            // emailMenu
+            // 
+            this.emailMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.copyToolStripMenuItem,
+            this.pasteToolStripMenuItem,
+            this.hyperlinkToolStripMenuItem,
+            this.insertImageToolStripMenuItem,
+            this.insertMergeFieldToolStripMenuItem});
+            this.emailMenu.Name = "emailMenu";
+            this.emailMenu.Size = new System.Drawing.Size(169, 136);
+            // 
+            // copyToolStripMenuItem
+            // 
+            this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
+            this.copyToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.copyToolStripMenuItem.Text = "Copy";
+            this.copyToolStripMenuItem.Click += new System.EventHandler(this.copyToolStripMenuItem_Click);
+            // 
+            // pasteToolStripMenuItem
+            // 
+            this.pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
+            this.pasteToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.pasteToolStripMenuItem.Text = "Paste";
+            // 
+            // hyperlinkToolStripMenuItem
+            // 
+            this.hyperlinkToolStripMenuItem.Name = "hyperlinkToolStripMenuItem";
+            this.hyperlinkToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.hyperlinkToolStripMenuItem.Text = "Hyperlink";
+            this.hyperlinkToolStripMenuItem.Click += new System.EventHandler(this.hyperlinkToolStripMenuItem_Click);
+            // 
+            // insertImageToolStripMenuItem
+            // 
+            this.insertImageToolStripMenuItem.Name = "insertImageToolStripMenuItem";
+            this.insertImageToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.insertImageToolStripMenuItem.Text = "Insert Image";
+            // 
             // logBox
             // 
-            this.logBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.logBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.logBox.BackColor = System.Drawing.SystemColors.Desktop;
             this.logBox.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.logBox.ForeColor = System.Drawing.SystemColors.Window;
-            this.logBox.Location = new System.Drawing.Point(373, 90);
+            this.logBox.Location = new System.Drawing.Point(15, 91);
             this.logBox.Name = "logBox";
             this.logBox.ReadOnly = true;
-            this.logBox.Size = new System.Drawing.Size(412, 416);
+            this.logBox.Size = new System.Drawing.Size(340, 416);
             this.logBox.TabIndex = 17;
             this.logBox.Text = resources.GetString("logBox.Text");
             // 
@@ -272,21 +320,10 @@
             this.templateButton.UseVisualStyleBackColor = true;
             this.templateButton.Click += new System.EventHandler(this.templateButton_Click);
             // 
-            // setupButton
-            // 
-            this.setupButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.setupButton.Location = new System.Drawing.Point(455, 513);
-            this.setupButton.Name = "setupButton";
-            this.setupButton.Size = new System.Drawing.Size(75, 23);
-            this.setupButton.TabIndex = 22;
-            this.setupButton.Text = "Setup";
-            this.setupButton.UseVisualStyleBackColor = true;
-            this.setupButton.Click += new System.EventHandler(this.setupButton_Click);
-            // 
             // settingsButton
             // 
             this.settingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.settingsButton.Location = new System.Drawing.Point(536, 512);
+            this.settingsButton.Location = new System.Drawing.Point(454, 512);
             this.settingsButton.Name = "settingsButton";
             this.settingsButton.Size = new System.Drawing.Size(75, 23);
             this.settingsButton.TabIndex = 23;
@@ -294,13 +331,18 @@
             this.settingsButton.UseVisualStyleBackColor = true;
             this.settingsButton.Click += new System.EventHandler(this.settingsButton_Click);
             // 
+            // insertMergeFieldToolStripMenuItem
+            // 
+            this.insertMergeFieldToolStripMenuItem.Name = "insertMergeFieldToolStripMenuItem";
+            this.insertMergeFieldToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.insertMergeFieldToolStripMenuItem.Text = "Insert Merge Field";
+            // 
             // main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(790, 550);
             this.Controls.Add(this.settingsButton);
-            this.Controls.Add(this.setupButton);
             this.Controls.Add(this.templateButton);
             this.Controls.Add(this.sendButton);
             this.Controls.Add(this.previewButton);
@@ -327,6 +369,8 @@
             this.Name = "main";
             this.Text = "Ryan\'s MailMerger V3";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.main_FormClosing);
+            this.Load += new System.EventHandler(this.main_Load);
+            this.emailMenu.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -356,8 +400,13 @@
         private System.Windows.Forms.Button previewButton;
         private System.Windows.Forms.Button sendButton;
         private System.Windows.Forms.Button templateButton;
-        private System.Windows.Forms.Button setupButton;
         private System.Windows.Forms.Button settingsButton;
+        private System.Windows.Forms.ContextMenuStrip emailMenu;
+        private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem pasteToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem hyperlinkToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem insertImageToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem insertMergeFieldToolStripMenuItem;
     }
 }
 
