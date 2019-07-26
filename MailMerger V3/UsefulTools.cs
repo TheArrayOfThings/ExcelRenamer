@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using System.Net.Mail;
 
-public static class StringTools
+public static class UsefulTools
 {
     // Count occurrences of strings.
     public static int CountStringOccurrences(string text, string pattern)
@@ -17,11 +18,29 @@ public static class StringTools
         }
         return count;
     }
+    public static void replaceHighlightedRtf(string toAdd, RichTextBox toReplace)
+    {
+        toReplace.SelectedRtf = "{\\rtf1" + toAdd + "}}";
+    }
+    public static void setMergeFields(String[] toSet, ToolStripMenuItem mainMenu, RichTextBox relevantBox)
+    {
+        for (int i = 0; i < toSet.Length; ++i)
+        {
+            ToolStripMenuItem newItem = new ToolStripMenuItem(toSet[i]);
+            newItem.Click += new System.EventHandler((sender, e) => insertMergeField(sender, e, relevantBox));
+            mainMenu.DropDownItems.Add(newItem);
+        }
+    }
+    private static void insertMergeField(object sender, System.EventArgs e, RichTextBox relevantBox)
+    {
+        relevantBox.SelectedRtf = "{\\rtf1" + "[[" + sender + "]]" + "}}";
+    }
     public static string grabImgSRC(int startIndex, string toGrab)
     {
         int srcIndex = toGrab.IndexOf("src=", startIndex) + 4;
         int srcEnd = toGrab.IndexOf("/>", srcIndex);
         int imgTagLength = (srcEnd - srcIndex) - 2;
+        Console.WriteLine("IMAGE SRC = " + toGrab.Substring(srcIndex, imgTagLength));
         return toGrab.Substring(srcIndex, imgTagLength);
     }
     public static string grabStyle(string toGrab)
@@ -74,6 +93,17 @@ public static class StringTools
         {
             toTrim.Select(toTrim.Text.IndexOf("\n"), 1);
             toTrim.SelectedRtf = "";
+        }
+    }
+    public static bool isValidEmail(string toCheck)
+    {
+        try
+        {
+            MailAddress test = new MailAddress(toCheck);
+            return true;
+        } catch (FormatException)
+        {
+            return false;
         }
     }
 }

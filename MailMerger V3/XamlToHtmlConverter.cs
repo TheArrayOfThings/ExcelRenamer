@@ -554,7 +554,7 @@ namespace Rtf2Html
         }
         private string htmlLinkify(string workString)
         {
-            MatchCollection matches = Regex.Matches(workString, ">([^\\s]+) &lt;([^\\s]+)&gt;<\\/span>");
+            MatchCollection matches = Regex.Matches(workString, ">([^\\s]+).&lt;([^\\s]+)&gt;<\\/span>");
             string parsedString = workString;
             string thisMatch = "";
             for (int i = 0; i < matches.Count; ++i)
@@ -575,7 +575,7 @@ namespace Rtf2Html
         private string extractLinkName(string toExtract)
         {
             int linkEndIndex = toExtract.IndexOf("&lt;");
-            int linkLength = linkEndIndex - 1;
+            int linkLength = linkEndIndex;
             return toExtract.Substring(0, linkLength);
         }
         private string ReplaceFirst(string searchText, string search, string replace)

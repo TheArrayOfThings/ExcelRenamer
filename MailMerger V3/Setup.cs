@@ -22,6 +22,7 @@ namespace MailMerger_V3
                 SettingsImporter.importSettings(ref rtfSignature, ref inboxesBox);
                 signatureBox.Rtf = rtfSignature;
             }
+            UsefulTools.setMergeFields(new string[] { "Name", "Email", "Job Title" }, insertMergeFieldToolStripMenuItem, signatureBox);
         }
 
         private void addButton_Click(object sender, EventArgs e)
@@ -29,8 +30,14 @@ namespace MailMerger_V3
             string inboxToAdd = Prompt.ShowDialog("Enter email address for inbox.", "Inbox details");
             if (!(inboxToAdd.Trim().Equals("")))
             {
-                inboxesBox.Items.Add(inboxToAdd.Trim());
-                inboxesBox.SelectedItem = inboxesBox.Items[inboxesBox.Items.Count - 1];
+                if (UsefulTools.isValidEmail(inboxToAdd.Trim()))
+                {
+                    inboxesBox.Items.Add(inboxToAdd.Trim());
+                    inboxesBox.SelectedItem = inboxesBox.Items[inboxesBox.Items.Count - 1];
+                } else
+                {
+                    MessageBox.Show("The email address you entered is invalid.", "Invalid Email Address");
+                }
             }
         }
 
@@ -60,9 +67,19 @@ namespace MailMerger_V3
             }
             
         }
+        private void copyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetData(DataFormats.Rtf, signatureBox.SelectedRtf);
+        }
+
+        private void hyperlinkToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string link = Prompt.ShowDialog("Enter link for hyperlink", "Hyperlink");
+            UsefulTools.replaceHighlightedRtf("\\cf3\\ul " + signatureBox.SelectedText + " <" + link + ">\\cf7\\ulnone", signatureBox);
+        }
         private void exportSettings()
         {
-            StringTools.trimRtf(signatureBox);
+            UsefulTools.trimRtf(signatureBox);
             string toWrite = "";
             toWrite = "****INBOXSTART****" + Environment.NewLine;
             foreach (string inbox in inboxesBox.Items)

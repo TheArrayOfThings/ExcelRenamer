@@ -81,7 +81,13 @@
     <Compile Include="Setup.Designer.cs">
       <DependentUpon>Setup.cs</DependentUpon>
     </Compile>
-    <Compile Include="StringTools.cs" />
+    <Compile Include="SheetSelect.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SheetSelect.Designer.cs">
+      <DependentUpon>SheetSelect.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UsefulTools.cs" />
     <Compile Include="XamlToHtmlConverter.cs" />
     <EmbeddedResource Include="MainWindow.resx">
       <DependentUpon>MainWindow.cs</DependentUpon>
@@ -98,6 +104,9 @@
     </Compile>
     <EmbeddedResource Include="Setup.resx">
       <DependentUpon>Setup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SheetSelect.resx">
+      <DependentUpon>SheetSelect.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config">
       <SubType>Designer</SubType>

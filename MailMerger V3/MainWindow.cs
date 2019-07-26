@@ -58,7 +58,7 @@ namespace MailMerger_V3
             startAutoDiscover.IsBackground = true;
             startAutoDiscover.Start();
             //Import settings etc
-            inboxes.Items.Add(System.DirectoryServices.AccountManagement.UserPrincipal.Current.EmailAddress);
+            inboxes.Items.Add(getEmail());
             if (File.Exists("Settings.txt"))
             {
                 importSettings();
@@ -84,8 +84,10 @@ namespace MailMerger_V3
                 try
                 {
                     importWorkbook(openBook.FileName);
-                    displayRecipient(0);
-                    currentRecipient = 1;
+                    if (importSuccess)
+                    {
+                        displayRecipient(0);
+                    }
                     importBook.Close();
                 } catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException)
                 {
@@ -111,6 +113,14 @@ namespace MailMerger_V3
                 fsFileStream.Close();
                 previewEmail.Delete(DeleteMode.HardDelete);
                 System.Diagnostics.Process.Start("preview.eml");
+                //Delete created resources
+                foreach (string eachString in toDelete)
+                {
+                    if (File.Exists(eachString))
+                    {
+                        File.Delete(eachString);
+                    }
+                }
             } else
             {
                 writeLog("Please import before previewing.");
@@ -130,12 +140,13 @@ namespace MailMerger_V3
             {
                 if (MessageBox.Show("Are you sure you want to send?", "Confirm send", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
-                    //Disable main form
+                    enableForm(false);
+                    emailPrep();
                     //Update on progress
-                    //Report on successes
-                    Thread sendThread = new Thread(sendAll);
-                    sendThread.IsBackground = true;
-                    sendThread.Start();
+                    BackgroundWorker backgroundSend = new BackgroundWorker();
+                    backgroundSend.DoWork += new DoWorkEventHandler(sendAll);
+                    backgroundSend.RunWorkerCompleted += new RunWorkerCompletedEventHandler(sendFinished);
+                    backgroundSend.RunWorkerAsync();
 
                 }
             }
@@ -165,7 +176,7 @@ namespace MailMerger_V3
 
         private void nextButton_Click(object sender, EventArgs e)
         {
-            if (currentRecipient < allData.Length - 2)
+            if (importSuccess && currentRecipient < allData.Length - 2)
             {
                 displayRecipient(currentRecipient + 1);
             }
@@ -173,7 +184,7 @@ namespace MailMerger_V3
 
         private void previousButton_Click(object sender, EventArgs e)
         {
-            if (currentRecipient > 0)
+            if (importSuccess && currentRecipient > 0)
             {
                 displayRecipient(currentRecipient - 1);
             }
@@ -188,6 +199,19 @@ namespace MailMerger_V3
             logBox.Text = logBox.Text + toWrite + Environment.NewLine + Environment.NewLine;
             logBox.SelectAll();
             logBox.SelectionAlignment = HorizontalAlignment.Center;
+            logBox.Select(logBox.Text.Length - 1, 1);
+            logBox.ScrollToCaret();
+        }
+        private void writeErrors(string toWrite)
+        {
+            if (File.Exists("Errors.txt"))
+            {
+                File.AppendAllText("Errors.txt", "Error occured at " + DateTime.Now + ":" + Environment.NewLine + toWrite + Environment.NewLine);
+            } else
+            {
+                File.Create("Errors.txt").Close();
+                File.AppendAllText("Errors.txt", "Error occured at " + DateTime.Now + ":" + Environment.NewLine + toWrite + Environment.NewLine);
+            }
         }
         private void importWorkbook(string filepath)
         {
@@ -196,8 +220,29 @@ namespace MailMerger_V3
             forenameColumn = -1;
             emailColumn = -1;
             referenceColumn = -1;
+            dearBox.Text = "";
+            refBox.Text = "";
+            emailBox.Text = "";
             importBook = excel.Workbooks.Open(filepath);
-            importSheet = importBook.Worksheets[1];
+            if (importBook.Worksheets.Count > 1)
+            {
+                string[] possibleSheets = new string[importBook.Worksheets.Count];
+                for (int i = 1; i <= importBook.Worksheets.Count; ++i)
+                {
+                    possibleSheets[i - 1] = importBook.Worksheets[i].Name;
+                }
+                string selectedSheet = "";
+                SheetSelect sheetSelect = new SheetSelect(possibleSheets);
+                while (sheetSelect.DialogResult != DialogResult.OK)
+                {
+                    sheetSelect.ShowDialog();
+                }
+                selectedSheet = sheetSelect.selectedSheet;
+                importSheet = importBook.Worksheets[selectedSheet];
+            } else
+            {
+                importSheet = importBook.Worksheets[1];
+            }
             usedRange = importSheet.UsedRange;
             columns = new string[usedRange.Columns.Count];
             allData = new string[usedRange.Rows.Count][];
@@ -207,7 +252,13 @@ namespace MailMerger_V3
                 allData[row] = new string[usedRange.Columns.Count];
                 for (int column = 0; column < usedRange.Columns.Count; ++column)
                 {
-                    allData[row][column] = importSheet.Cells[row + 1, column + 1].Value.ToString();
+                    if (importSheet.Cells[row + 1, column + 1].Value == null)
+                    {
+                        allData[row][column] = "";
+                    } else
+                    {
+                        allData[row][column] = importSheet.Cells[row + 1, column + 1].Value.ToString();
+                    }
                 }
             }
             //Get column headers
@@ -215,7 +266,7 @@ namespace MailMerger_V3
             {
                 if (forenameColumn == -1)
                 {
-                    if (StringTools.findMatch(allData[0][i], new string[] { "forename", "firstname", "first name", "fore name" }))
+                    if (UsefulTools.findMatch(allData[0][i], new string[] { "forename", "firstname", "first name", "fore name" }))
                     {
                         forenameColumn = i;
                         writeLog("Forename is column " + (forenameColumn + 1));
@@ -223,7 +274,7 @@ namespace MailMerger_V3
                 }
                 if (referenceColumn == -1)
                 {
-                    if (StringTools.findMatch(allData[0][i], new string[] { "reference", " id" }))
+                    if (UsefulTools.findMatch(allData[0][i], new string[] { "reference", " id" }))
                     {
                         referenceColumn = i;
                         writeLog("Reference is column " + (referenceColumn + 1));
@@ -231,7 +282,7 @@ namespace MailMerger_V3
                 }
                 if (emailColumn == -1)
                 {
-                    if (StringTools.findMatch(allData[0][i], new string[] { "email", " e-mail" }))
+                    if (UsefulTools.findMatch(allData[0][i], new string[] { "email", " e-mail" }))
                     {
                         emailColumn = i;
                         writeLog("Email is column " + (emailColumn + 1));
@@ -243,7 +294,13 @@ namespace MailMerger_V3
                 writeLog("Number of recipients: " + (allData.Length - 1));
                 writeLog("Import successful!");
                 importSuccess = true;
-                setMergeFields(allData[0]);
+                UsefulTools.setMergeFields(allData[0], insertMergeFieldToolStripMenuItem, bodyBox);
+            } else if (forenameColumn == -1)
+            {
+                writeLog("Import failed - forename column missing.");
+            } else if (emailColumn == -1)
+            {
+                writeLog("Import failed - email column missing.");
             }
         }
 
@@ -254,7 +311,7 @@ namespace MailMerger_V3
                 importBook.Close();
             } catch (Exception)
             {
-                //Do nothing!
+                //Excel workbook already closed - do nothing!
             }
             if (File.Exists("preview.eml"))
             {
@@ -292,20 +349,21 @@ namespace MailMerger_V3
         }
         private void autoDiscoverThread()
         {
-            service.AutodiscoverUrl(System.DirectoryServices.AccountManagement.UserPrincipal.Current.EmailAddress);
+            service.AutodiscoverUrl(getEmail());
             Console.WriteLine("Autodiscover completed. URL = " + service.Url);
             autoDiscoverFinished = true;
         }
         private EmailMessage createEmail(string[] recipientData, int recipientNumber)
         {
             EmailMessage email = new EmailMessage(service);
-            int imageOccurences = StringTools.CountStringOccurrences(htmlEmailBody, "<img");
+            int imageOccurences = UsefulTools.CountStringOccurrences(htmlEmailBody, "<img");
             int lastImgOccurence = 0;
             //Attach all images and embed them into html body
+            Console.WriteLine("Image occurences = " + imageOccurences);
             for (int i = 0; i < imageOccurences; ++i)
             {
-                lastImgOccurence = htmlEmailBody.IndexOf("<img", lastImgOccurence);
-                string imgSRC = StringTools.grabImgSRC(lastImgOccurence, htmlEmailBody);
+                lastImgOccurence = htmlEmailBody.IndexOf("<img", lastImgOccurence + 1);
+                string imgSRC = UsefulTools.grabImgSRC(lastImgOccurence, htmlEmailBody);
                 string fileLocation = imgSRC.Substring(1);
                 htmlEmailBody.Replace(imgSRC, "CID:" + fileLocation.Substring(1));
                 email.Attachments.AddFileAttachment(fileLocation);
@@ -313,20 +371,19 @@ namespace MailMerger_V3
                 email.Attachments[i].ContentId = fileLocation.Substring(1);
                 toDelete.Add(fileLocation);
             }
-            string thisBody = "<span style=\"" + StringTools.grabStyle(htmlEmailBody) + "\">";
+            string thisBody = "<span style=\"" + UsefulTools.grabStyle(htmlEmailBody) + "\">";
             thisBody += "Dear " + recipientData[forenameColumn] + "," + "<br/><br/>";
             thisBody += replaceMergeFields(htmlEmailBody, recipientNumber) + "<br/>";
             if (!signatureContainsSignoff)
             {
                 thisBody += "Kind regards" + "<br/><br/>";
             }
-            thisBody += StringTools.replaceStyle(htmlEmailBody, htmlSignature);
+            thisBody += UsefulTools.replaceStyle(htmlEmailBody, htmlSignature);
             email.Body = thisBody;
             email.Subject = subjectBox.Text;
             email.ToRecipients.Add(recipientData[emailColumn]);
             email.From = sendFrom;
             return email;
-
         }
 
         private void main_Load(object sender, EventArgs e)
@@ -337,7 +394,7 @@ namespace MailMerger_V3
                 this.Close();
             }
         }
-
+        //MenuItems events
         private void copyToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Clipboard.SetData(DataFormats.Rtf, bodyBox.SelectedRtf);
@@ -346,12 +403,18 @@ namespace MailMerger_V3
         private void hyperlinkToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string link = Prompt.ShowDialog("Enter link for hyperlink", "Hyperlink");
-            replaceHighlightedRtf("\\cf3\\ul " + bodyBox.SelectedText + " <" + link + ">\\cf7\\ulnone");
+            UsefulTools.replaceHighlightedRtf("\\cf3\\ul " + bodyBox.SelectedText + " <" + link + ">\\cf7\\ulnone", bodyBox);
+        }
+
+        private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            bodyBox.SelectedRtf = Clipboard.GetData(DataFormats.Rtf).ToString();
         }
 
         private void emailPrep()
         {
-            StringTools.trimRtf(bodyBox);
+            htmlSignature = replaceSignatureFields(htmlSignature);
+            UsefulTools.trimRtf(bodyBox);
             Rtf2Html.HtmlResult convertedRTF = RtfToHtmlConverter.RtfToHtml(bodyBox.Rtf);
             convertedRTF.WriteToFile("emailHTML.html");
             htmlEmailBody = convertedRTF.Html;
@@ -370,19 +433,32 @@ namespace MailMerger_V3
                 signatureContainsSignoff = false;
             }
         }
-        private void sendAll()
+        private void sendAll(object sender, DoWorkEventArgs e)
         {
-            emailPrep();
+            string errors = "";
             toDelete = new List<string>();
             toDelete.Add("emailHTML.html");
-            string sendingInbox = inboxes.SelectedItem.ToString().Trim();
-            Mailbox sentBox = new Mailbox(sendingInbox);
-            sentBoxSentItems = new FolderId(WellKnownFolderName.SentItems, sentBox);
-            sentBoxDrafts = new FolderId(WellKnownFolderName.Drafts, sentBox);
-            sendFrom = new EmailAddress(sendingInbox);
             for (int i = 1; i < allData.Length; ++i)
             {
-                sendEmail(allData[i], i);
+                if (allData[i][forenameColumn].Trim().Equals("") && allData[i][emailColumn].Trim().Equals(""))
+                {
+                    //Do nothing
+                }
+                else if (allData[i][forenameColumn].Trim().Equals(""))
+                {
+                    errors += ("Error for recipient on row " + i + " (" + allData[i][emailColumn] + ") - forename is missing." + Environment.NewLine);
+                }
+                else if (allData[i][emailColumn].Trim().Equals(""))
+                {
+                    errors += ("Error for recipient on row " + i + " (" + allData[i][forenameColumn] + ") - email address is missing." + Environment.NewLine);
+                }
+                else if (!(UsefulTools.isValidEmail(allData[i][emailColumn])))
+                {
+                    errors += ("Error for recipient on row " + i + " (" + allData[i][forenameColumn] + ") - email address is invalid." + Environment.NewLine);
+                }  else
+                {
+                    sendEmail(allData[i], i);
+                }
             }
             //Delete created resources
             foreach (string eachString in toDelete)
@@ -392,16 +468,13 @@ namespace MailMerger_V3
                     File.Delete(eachString);
                 }
             }
+            e.Result = errors;
         }
         private void sendEmail(String[] recipientData, int recipientNumber)
         {
             EmailMessage finalEmail = createEmail(recipientData, recipientNumber);
             finalEmail.Save(sentBoxDrafts);
             finalEmail.SendAndSaveCopy(sentBoxSentItems);
-        }
-        private void replaceHighlightedRtf(string toAdd)
-        {
-            bodyBox.SelectedRtf = "{\\rtf1" + toAdd + "}}";
         }
         private void importSettings()
         {
@@ -416,19 +489,6 @@ namespace MailMerger_V3
             SettingsImporter.importSettings(ref rtfSignature, ref inboxes);
             htmlSignature = RtfToHtmlConverter.RtfToHtml(rtfSignature).Html;
         }
-        private void setMergeFields(String[] toSet)
-        {
-            for (int i = 0; i < toSet.Length; ++i)
-            {
-                ToolStripMenuItem newItem = new ToolStripMenuItem(toSet[i]);
-                newItem.Click += new System.EventHandler(this.insertMergeField);
-                insertMergeFieldToolStripMenuItem.DropDownItems.Add(newItem);
-            }
-        }
-        private void insertMergeField(object sender, System.EventArgs e)
-        {
-            bodyBox.SelectedRtf = "{\\rtf1" + "[[" + sender + "]]" + "}}";
-        }
         private string replaceMergeFields(string toReplace, int recipientNumber)
         {
             for (int i = 0; i < allData[0].Length; ++i)
@@ -440,6 +500,69 @@ namespace MailMerger_V3
                 }
             }
             return toReplace;
+        }
+        private string replaceSignatureFields(string toReplace)
+        {
+            if (toReplace.Contains("[[Name]]"))
+            {
+                toReplace = toReplace.Replace("[[Name]]", getName());
+            }
+            if (toReplace.Contains("[[Email]]"))
+            {
+                toReplace = toReplace.Replace("[[Email]]", getEmail());
+            }
+            if (toReplace.Contains("[[Job Title]]"))
+            {
+                toReplace = toReplace.Replace("[[Job Title]]", getJob());
+            }
+            return toReplace;
+        }
+        private void enableForm(bool enabled)
+        {
+            foreach (Control c in this.Controls)
+            {
+                c.Enabled = enabled;
+            }
+        }
+        private void sendFinished(object sender, RunWorkerCompletedEventArgs e)
+        {
+            enableForm(true);
+            
+            if (e.Result.ToString().Trim().Equals("")) {
+                writeLog("Emails sent without errors!");
+            } else
+            {
+                writeLog("Emails sent with errors:" + Environment.NewLine + Environment.NewLine + e.Result.ToString());
+                writeErrors(e.Result.ToString());
+            }
+        }
+
+        private string getName()
+        {
+            return System.DirectoryServices.AccountManagement.UserPrincipal.Current.DisplayName;
+        }
+        private string getEmail()
+        {
+            return System.DirectoryServices.AccountManagement.UserPrincipal.Current.EmailAddress;
+        }
+        private string getJob()
+        {
+            string jobTitle = "";
+            while (!autoDiscoverFinished)
+            {
+                Thread.Sleep(100);
+            }
+            try {
+                jobTitle = service.ResolveName(getEmail().Substring(0, getEmail().IndexOf('@')), ResolveNameSearchLocation.DirectoryOnly, true)[0].Contact.JobTitle;
+            } catch (Exception)
+            {
+                while (jobTitle.Equals(""))
+                {
+                    jobTitle = Prompt.ShowDialog("Job title not found! Please enter job title.", "Job Title Required");
+                }
+            }
+            
+            return jobTitle;
         }
     }
 }

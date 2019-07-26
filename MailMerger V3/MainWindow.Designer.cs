@@ -52,13 +52,13 @@
             this.pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.hyperlinkToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.insertImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.insertMergeFieldToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.logBox = new System.Windows.Forms.RichTextBox();
             this.importButton = new System.Windows.Forms.Button();
             this.previewButton = new System.Windows.Forms.Button();
             this.sendButton = new System.Windows.Forms.Button();
             this.templateButton = new System.Windows.Forms.Button();
             this.settingsButton = new System.Windows.Forms.Button();
-            this.insertMergeFieldToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.emailMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -234,7 +234,7 @@
             this.insertImageToolStripMenuItem,
             this.insertMergeFieldToolStripMenuItem});
             this.emailMenu.Name = "emailMenu";
-            this.emailMenu.Size = new System.Drawing.Size(169, 136);
+            this.emailMenu.Size = new System.Drawing.Size(169, 114);
             // 
             // copyToolStripMenuItem
             // 
@@ -248,6 +248,7 @@
             this.pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
             this.pasteToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.pasteToolStripMenuItem.Text = "Paste";
+            this.pasteToolStripMenuItem.Click += new System.EventHandler(this.pasteToolStripMenuItem_Click);
             // 
             // hyperlinkToolStripMenuItem
             // 
@@ -261,6 +262,12 @@
             this.insertImageToolStripMenuItem.Name = "insertImageToolStripMenuItem";
             this.insertImageToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.insertImageToolStripMenuItem.Text = "Insert Image";
+            // 
+            // insertMergeFieldToolStripMenuItem
+            // 
+            this.insertMergeFieldToolStripMenuItem.Name = "insertMergeFieldToolStripMenuItem";
+            this.insertMergeFieldToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.insertMergeFieldToolStripMenuItem.Text = "Insert Merge Field";
             // 
             // logBox
             // 
@@ -330,12 +337,6 @@
             this.settingsButton.Text = "Settings";
             this.settingsButton.UseVisualStyleBackColor = true;
             this.settingsButton.Click += new System.EventHandler(this.settingsButton_Click);
-            // 
-            // insertMergeFieldToolStripMenuItem
-            // 
-            this.insertMergeFieldToolStripMenuItem.Name = "insertMergeFieldToolStripMenuItem";
-            this.insertMergeFieldToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
-            this.insertMergeFieldToolStripMenuItem.Text = "Insert Merge Field";
             // 
             // main
             // 
