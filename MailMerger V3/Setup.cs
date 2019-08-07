@@ -18,9 +18,15 @@ namespace MailMerger_V3
             InitializeComponent();
             if(File.Exists("Settings.txt"))
             {
-                string rtfSignature = "";
-                SettingsImporter.importSettings(ref rtfSignature, ref inboxesBox);
+                string rtfSignature = "", referenceAliases = "", defaultFont = "";
+
+                SettingsImporter.importSettings(ref rtfSignature, ref inboxesBox, ref referenceAliases, ref defaultFont);
+                refAliasesBox.Text = referenceAliases;
+                defaultFontBox.Text = defaultFont;
                 signatureBox.Rtf = rtfSignature;
+            } else
+            {
+                defaultFontBox.Text = "Font Name=Calibri, Font Size=12";
             }
             UsefulTools.setMergeFields(new string[] { "Name", "Email", "Job Title" }, insertMergeFieldToolStripMenuItem, signatureBox);
         }
@@ -88,12 +94,28 @@ namespace MailMerger_V3
             }
             toWrite += ("****INBOXEND****" + Environment.NewLine);
             toWrite += ("****SIGNATURESTART****" + Environment.NewLine);
-            toWrite += (signatureBox.Rtf);
+            toWrite += (signatureBox.Rtf + Environment.NewLine);
             toWrite += ("****SIGNATUREEND****" + Environment.NewLine);
+            toWrite += ("****REFALIASESSTART****" + Environment.NewLine);
+            toWrite += (refAliasesBox.Text.Trim() + Environment.NewLine);
+            toWrite += ("****REFALIASESEND****" + Environment.NewLine);
+            toWrite += ("****DEFAULTFONTSTART****" + Environment.NewLine);
+            toWrite += (defaultFontBox.Text.ToString().Trim() + Environment.NewLine);
+            toWrite += ("****DEFAULTFONTEND****" + Environment.NewLine);
             FileStream settingsFile = File.Create("Settings.txt");
             byte[] toWriteBytes = new UTF8Encoding(true).GetBytes(toWrite);
             settingsFile.Write(toWriteBytes, 0, toWriteBytes.Length);
             settingsFile.Close();
+        }
+
+        private void selectFontButton_Click(object sender, EventArgs e)
+        {
+            FontDialog changeFont = new FontDialog();
+            if (changeFont.ShowDialog() == DialogResult.OK)
+            {
+                string fullFont = changeFont.Font.ToString();
+                defaultFontBox.Text = "Font Name=" + UsefulTools.getFontValue(fullFont, "Name") + ", Font Size=" + UsefulTools.getFontValue(fullFont, "Size");
+            }
         }
     }
 }

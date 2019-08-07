@@ -126,6 +126,8 @@ Anything added in the 'Signature' box will be automatically added at the end of 
 The 'Inboxes' selection is used to add inboxes that you wish to email from.
 
 You can dynamically insert your Name, Job Title, and Email Address using 'Insert Merge Field' in the right-click menu.
+
+The 'Reference Aliases' is used to find a customer reference number to auto-insert from your data (i.e. Student ID, Student Reference).
 </value>
   </data>
   <metadata name="signatureMenu.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">

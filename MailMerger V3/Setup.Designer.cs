@@ -44,6 +44,11 @@
             this.insertImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.insertMergeFieldToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.submitButton = new System.Windows.Forms.Button();
+            this.referenceLabel = new System.Windows.Forms.Label();
+            this.refAliasesBox = new System.Windows.Forms.TextBox();
+            this.defaultFontLabel = new System.Windows.Forms.Label();
+            this.selectFontButton = new System.Windows.Forms.Button();
+            this.defaultFontBox = new System.Windows.Forms.TextBox();
             this.signatureMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -58,7 +63,7 @@
             this.instructionsBox.Multiline = true;
             this.instructionsBox.Name = "instructionsBox";
             this.instructionsBox.ReadOnly = true;
-            this.instructionsBox.Size = new System.Drawing.Size(529, 161);
+            this.instructionsBox.Size = new System.Drawing.Size(764, 161);
             this.instructionsBox.TabIndex = 100;
             this.instructionsBox.Text = resources.GetString("instructionsBox.Text");
             this.instructionsBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -78,14 +83,14 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.inboxesBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.inboxesBox.FormattingEnabled = true;
-            this.inboxesBox.Location = new System.Drawing.Point(63, 167);
+            this.inboxesBox.Location = new System.Drawing.Point(102, 167);
             this.inboxesBox.Name = "inboxesBox";
-            this.inboxesBox.Size = new System.Drawing.Size(454, 21);
+            this.inboxesBox.Size = new System.Drawing.Size(650, 21);
             this.inboxesBox.TabIndex = 0;
             // 
             // addButton
             // 
-            this.addButton.Location = new System.Drawing.Point(63, 195);
+            this.addButton.Location = new System.Drawing.Point(102, 194);
             this.addButton.Name = "addButton";
             this.addButton.Size = new System.Drawing.Size(75, 23);
             this.addButton.TabIndex = 1;
@@ -95,7 +100,7 @@
             // 
             // removeButton
             // 
-            this.removeButton.Location = new System.Drawing.Point(145, 195);
+            this.removeButton.Location = new System.Drawing.Point(184, 194);
             this.removeButton.Name = "removeButton";
             this.removeButton.Size = new System.Drawing.Size(75, 23);
             this.removeButton.TabIndex = 2;
@@ -107,7 +112,7 @@
             // 
             this.signatureLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.signatureLabel.AutoSize = true;
-            this.signatureLabel.Location = new System.Drawing.Point(5, 245);
+            this.signatureLabel.Location = new System.Drawing.Point(4, 363);
             this.signatureLabel.Name = "signatureLabel";
             this.signatureLabel.Size = new System.Drawing.Size(52, 13);
             this.signatureLabel.TabIndex = 5;
@@ -120,9 +125,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.signatureBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.signatureBox.ContextMenuStrip = this.signatureMenu;
-            this.signatureBox.Location = new System.Drawing.Point(63, 225);
+            this.signatureBox.Location = new System.Drawing.Point(101, 306);
             this.signatureBox.Name = "signatureBox";
-            this.signatureBox.Size = new System.Drawing.Size(454, 151);
+            this.signatureBox.Size = new System.Drawing.Size(650, 158);
             this.signatureBox.TabIndex = 3;
             this.signatureBox.Text = "";
             // 
@@ -170,7 +175,7 @@
             // submitButton
             // 
             this.submitButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.submitButton.Location = new System.Drawing.Point(442, 382);
+            this.submitButton.Location = new System.Drawing.Point(676, 470);
             this.submitButton.Name = "submitButton";
             this.submitButton.Size = new System.Drawing.Size(75, 23);
             this.submitButton.TabIndex = 4;
@@ -178,11 +183,64 @@
             this.submitButton.UseVisualStyleBackColor = true;
             this.submitButton.Click += new System.EventHandler(this.submitButton_Click);
             // 
+            // referenceLabel
+            // 
+            this.referenceLabel.AutoSize = true;
+            this.referenceLabel.Location = new System.Drawing.Point(5, 223);
+            this.referenceLabel.Name = "referenceLabel";
+            this.referenceLabel.Size = new System.Drawing.Size(93, 13);
+            this.referenceLabel.TabIndex = 101;
+            this.referenceLabel.Text = "Reference Aliases";
+            // 
+            // refAliasesBox
+            // 
+            this.refAliasesBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.refAliasesBox.Location = new System.Drawing.Point(102, 223);
+            this.refAliasesBox.Name = "refAliasesBox";
+            this.refAliasesBox.Size = new System.Drawing.Size(649, 20);
+            this.refAliasesBox.TabIndex = 102;
+            this.refAliasesBox.Text = "Replace with comma separated list of customer reference aliases";
+            // 
+            // defaultFontLabel
+            // 
+            this.defaultFontLabel.AutoSize = true;
+            this.defaultFontLabel.Location = new System.Drawing.Point(5, 246);
+            this.defaultFontLabel.Name = "defaultFontLabel";
+            this.defaultFontLabel.Size = new System.Drawing.Size(65, 13);
+            this.defaultFontLabel.TabIndex = 103;
+            this.defaultFontLabel.Text = "Default Font";
+            // 
+            // selectFontButton
+            // 
+            this.selectFontButton.Location = new System.Drawing.Point(102, 277);
+            this.selectFontButton.Name = "selectFontButton";
+            this.selectFontButton.Size = new System.Drawing.Size(75, 23);
+            this.selectFontButton.TabIndex = 108;
+            this.selectFontButton.Text = "Select";
+            this.selectFontButton.UseVisualStyleBackColor = true;
+            this.selectFontButton.Click += new System.EventHandler(this.selectFontButton_Click);
+            // 
+            // defaultFontBox
+            // 
+            this.defaultFontBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.defaultFontBox.Location = new System.Drawing.Point(102, 246);
+            this.defaultFontBox.Name = "defaultFontBox";
+            this.defaultFontBox.ReadOnly = true;
+            this.defaultFontBox.Size = new System.Drawing.Size(650, 20);
+            this.defaultFontBox.TabIndex = 109;
+            // 
             // Setup
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(529, 412);
+            this.ClientSize = new System.Drawing.Size(764, 505);
+            this.Controls.Add(this.defaultFontBox);
+            this.Controls.Add(this.selectFontButton);
+            this.Controls.Add(this.defaultFontLabel);
+            this.Controls.Add(this.refAliasesBox);
+            this.Controls.Add(this.referenceLabel);
             this.Controls.Add(this.submitButton);
             this.Controls.Add(this.signatureBox);
             this.Controls.Add(this.signatureLabel);
@@ -216,5 +274,10 @@
         private System.Windows.Forms.ToolStripMenuItem hyperlinkToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem insertImageToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem insertMergeFieldToolStripMenuItem;
+        private System.Windows.Forms.Label referenceLabel;
+        private System.Windows.Forms.TextBox refAliasesBox;
+        private System.Windows.Forms.Label defaultFontLabel;
+        private System.Windows.Forms.Button selectFontButton;
+        private System.Windows.Forms.TextBox defaultFontBox;
     }
 }

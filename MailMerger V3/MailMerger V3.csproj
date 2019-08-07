@@ -62,6 +62,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attachment.cs" />
     <Compile Include="HtmlResult.cs" />
     <Compile Include="MainWindow.cs">
       <SubType>Form</SubType>

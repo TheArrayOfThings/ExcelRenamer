@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Net.Mail;
+using System.Drawing;
 
 public static class UsefulTools
 {
@@ -66,6 +67,10 @@ public static class UsefulTools
     {
         foreach (string eachString in matchArray)
         {
+            if (eachString.Trim().Equals(""))
+            {
+                return false;
+            }
             if (toCheck.ToLower().Contains(eachString.ToLower()))
             {
                 return true;
@@ -105,5 +110,20 @@ public static class UsefulTools
         {
             return false;
         }
+    }
+    public static string getFontValue(string toParse, string attributeName)
+    {
+        int startIndex = toParse.IndexOf(attributeName) + attributeName.Length + 1;
+        int endIndex = 0;
+        if (toParse.IndexOf(',', startIndex) == -1)
+        {
+            endIndex = toParse.Length;
+        } else
+        {
+            endIndex = toParse.IndexOf(',', startIndex);
+        }
+        int length = endIndex - startIndex;
+        Console.WriteLine("RETURNING: " + toParse.Substring(startIndex, length));
+        return toParse.Substring(startIndex, length);
     }
 }

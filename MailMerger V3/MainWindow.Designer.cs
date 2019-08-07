@@ -57,7 +57,6 @@
             this.importButton = new System.Windows.Forms.Button();
             this.previewButton = new System.Windows.Forms.Button();
             this.sendButton = new System.Windows.Forms.Button();
-            this.templateButton = new System.Windows.Forms.Button();
             this.settingsButton = new System.Windows.Forms.Button();
             this.emailMenu.SuspendLayout();
             this.SuspendLayout();
@@ -166,16 +165,18 @@
             // 
             this.attachments.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.attachments.DisplayMember = "fileName";
             this.attachments.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.attachments.FormattingEnabled = true;
             this.attachments.Location = new System.Drawing.Point(443, 35);
             this.attachments.Name = "attachments";
             this.attachments.Size = new System.Drawing.Size(342, 21);
             this.attachments.TabIndex = 11;
+            this.attachments.ValueMember = "fileName";
             // 
             // clearButton
             // 
-            this.clearButton.Location = new System.Drawing.Point(303, 62);
+            this.clearButton.Location = new System.Drawing.Point(733, 512);
             this.clearButton.Name = "clearButton";
             this.clearButton.Size = new System.Drawing.Size(52, 23);
             this.clearButton.TabIndex = 12;
@@ -286,7 +287,7 @@
             // importButton
             // 
             this.importButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.importButton.Location = new System.Drawing.Point(15, 513);
+            this.importButton.Location = new System.Drawing.Point(373, 512);
             this.importButton.Name = "importButton";
             this.importButton.Size = new System.Drawing.Size(75, 23);
             this.importButton.TabIndex = 18;
@@ -297,7 +298,7 @@
             // previewButton
             // 
             this.previewButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.previewButton.Location = new System.Drawing.Point(97, 513);
+            this.previewButton.Location = new System.Drawing.Point(455, 512);
             this.previewButton.Name = "previewButton";
             this.previewButton.Size = new System.Drawing.Size(75, 23);
             this.previewButton.TabIndex = 19;
@@ -308,7 +309,7 @@
             // sendButton
             // 
             this.sendButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.sendButton.Location = new System.Drawing.Point(179, 513);
+            this.sendButton.Location = new System.Drawing.Point(537, 512);
             this.sendButton.Name = "sendButton";
             this.sendButton.Size = new System.Drawing.Size(75, 23);
             this.sendButton.TabIndex = 20;
@@ -316,21 +317,10 @@
             this.sendButton.UseVisualStyleBackColor = true;
             this.sendButton.Click += new System.EventHandler(this.sendButton_Click);
             // 
-            // templateButton
-            // 
-            this.templateButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.templateButton.Location = new System.Drawing.Point(373, 513);
-            this.templateButton.Name = "templateButton";
-            this.templateButton.Size = new System.Drawing.Size(75, 23);
-            this.templateButton.TabIndex = 21;
-            this.templateButton.Text = "Template";
-            this.templateButton.UseVisualStyleBackColor = true;
-            this.templateButton.Click += new System.EventHandler(this.templateButton_Click);
-            // 
             // settingsButton
             // 
             this.settingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.settingsButton.Location = new System.Drawing.Point(454, 512);
+            this.settingsButton.Location = new System.Drawing.Point(15, 512);
             this.settingsButton.Name = "settingsButton";
             this.settingsButton.Size = new System.Drawing.Size(75, 23);
             this.settingsButton.TabIndex = 23;
@@ -344,7 +334,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(790, 550);
             this.Controls.Add(this.settingsButton);
-            this.Controls.Add(this.templateButton);
             this.Controls.Add(this.sendButton);
             this.Controls.Add(this.previewButton);
             this.Controls.Add(this.importButton);
@@ -400,7 +389,6 @@
         private System.Windows.Forms.Button importButton;
         private System.Windows.Forms.Button previewButton;
         private System.Windows.Forms.Button sendButton;
-        private System.Windows.Forms.Button templateButton;
         private System.Windows.Forms.Button settingsButton;
         private System.Windows.Forms.ContextMenuStrip emailMenu;
         private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;

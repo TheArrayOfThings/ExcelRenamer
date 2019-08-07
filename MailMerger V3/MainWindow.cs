@@ -29,6 +29,7 @@ namespace MailMerger_V3
         string[][] allData { get; set; }
         bool importSuccess = false;
         bool initialiseSuccess { get; set; } = false;
+        string errors = "";
 
         //EWS stuff
         ExchangeService service = new ExchangeService();
@@ -40,11 +41,14 @@ namespace MailMerger_V3
 
         //Related to files and attachments
         List<string> toDelete;
+        OpenFileDialog getAttachment = new OpenFileDialog();
 
         //Settings
         string rtfSignature;
         string htmlSignature;
         string htmlEmailBody;
+        string[] referenceAliases;
+        string defaultFont;
         bool signatureContainsSignoff = false;
 
         public main()
@@ -63,6 +67,7 @@ namespace MailMerger_V3
             {
                 importSettings();
                 initialiseSuccess = true;
+                bodyBox.Font = new Font(UsefulTools.getFontValue(defaultFont, "Name"), float.Parse(UsefulTools.getFontValue(defaultFont, "Size")));
             }
             else
             {
@@ -136,6 +141,12 @@ namespace MailMerger_V3
             } else if (autoDiscoverFinished == false)
             {
                 writeLog("System is still configuring your exchange profile - please wait for a couple of minutes and try again.");
+            } else if (subjectBox.Text.Trim().Equals("") || subjectBox.Text.Trim().Equals("[Replace with subject]"))
+            {
+                writeLog("Please change the email subject before attempting to send.");
+            } else if (bodyBox.Text.Trim().Equals("") || bodyBox.Text.Trim().Equals("[Replace with body of email]"))
+            {
+                writeLog("Please change the email body before attempting to send.");
             } else
             {
                 if (MessageBox.Show("Are you sure you want to send?", "Confirm send", MessageBoxButtons.YesNo) == DialogResult.Yes)
@@ -166,12 +177,28 @@ namespace MailMerger_V3
 
         private void addButton_Click(object sender, EventArgs e)
         {
+            if (getAttachment.ShowDialog() == DialogResult.OK && File.Exists(getAttachment.FileName))
+            {
 
+                attachments.Items.Add(new Attachment(getAttachment.FileName));
+                attachments.SelectedItem = attachments.Items[attachments.Items.Count - 1];
+            } else
+            {
+                writeLog("Please select a valid file to attach.");
+            }
+            
         }
 
         private void removeButton_Click(object sender, EventArgs e)
         {
-            Console.WriteLine(bodyBox.Rtf);
+            if (attachments.Items.Count > 0)
+            {
+                attachments.Items.RemoveAt(attachments.SelectedIndex);
+                if (attachments.Items.Count > 0)
+                {
+                    attachments.SelectedItem = attachments.Items[attachments.Items.Count - 1];
+                }
+            }
         }
 
         private void nextButton_Click(object sender, EventArgs e)
@@ -192,7 +219,8 @@ namespace MailMerger_V3
 
         private void clearButton_Click(object sender, EventArgs e)
         {
-            
+            bodyBox.Text = "";
+            subjectBox.Text = "";
         }
         private void writeLog(string toWrite)
         {
@@ -274,10 +302,10 @@ namespace MailMerger_V3
                 }
                 if (referenceColumn == -1)
                 {
-                    if (UsefulTools.findMatch(allData[0][i], new string[] { "reference", " id" }))
+                    if ((!(referenceAliases[0].Equals(""))) && UsefulTools.findMatch(allData[0][i], referenceAliases))
                     {
                         referenceColumn = i;
-                        writeLog("Reference is column " + (referenceColumn + 1));
+                        writeLog(referenceAliases[0] + " is column " + (referenceColumn + 1));
                     }
                 }
                 if (emailColumn == -1)
@@ -292,7 +320,13 @@ namespace MailMerger_V3
             if (forenameColumn != -1 && emailColumn != -1)
             {
                 writeLog("Number of recipients: " + (allData.Length - 1));
-                writeLog("Import successful!");
+                if (referenceColumn == -1)
+                {
+                    writeLog("Import was successful - but reference column was not found.");
+                } else
+                {
+                    writeLog("Import successful!");
+                }
                 importSuccess = true;
                 UsefulTools.setMergeFields(allData[0], insertMergeFieldToolStripMenuItem, bodyBox);
             } else if (forenameColumn == -1)
@@ -381,8 +415,23 @@ namespace MailMerger_V3
             thisBody += UsefulTools.replaceStyle(htmlEmailBody, htmlSignature);
             email.Body = thisBody;
             email.Subject = subjectBox.Text;
+            if (referenceColumn != -1)
+            {
+                email.Subject += " - " + referenceAliases[0] + ": " + recipientData[referenceColumn];
+            }
             email.ToRecipients.Add(recipientData[emailColumn]);
             email.From = sendFrom;
+            //Attach attachments
+            foreach (Attachment eachAttachment in attachments.Items)
+            {
+                if (File.Exists(eachAttachment.filePath))
+                {
+                    email.Attachments.AddFileAttachment(eachAttachment.filePath);
+                } else
+                {
+                    errors += ("Error for recipient on row " + recipientNumber + " (" + allData[recipientNumber][forenameColumn] + ") - attachment \"" + eachAttachment.fileName + "\" cannot be found." + Environment.NewLine);
+                }
+            }
             return email;
         }
 
@@ -435,7 +484,6 @@ namespace MailMerger_V3
         }
         private void sendAll(object sender, DoWorkEventArgs e)
         {
-            string errors = "";
             toDelete = new List<string>();
             toDelete.Add("emailHTML.html");
             for (int i = 1; i < allData.Length; ++i)
@@ -486,7 +534,22 @@ namespace MailMerger_V3
                     inboxes.Items.Remove(inboxes.Items[1]);
                 }
             }
-            SettingsImporter.importSettings(ref rtfSignature, ref inboxes);
+            string stringAliases = "";
+            SettingsImporter.importSettings(ref rtfSignature, ref inboxes, ref stringAliases, ref defaultFont);
+            if (stringAliases.Trim().Equals("Replace with comma separated list of customer reference aliases") || stringAliases.Trim().Equals(""))
+            {
+                referenceAliases = new string[] { "" };
+            } else if (stringAliases.IndexOf(',') != -1)
+            {
+                referenceAliases = stringAliases.Split(',').Select(p => p.Trim()).ToArray();
+            } else
+            {
+                referenceAliases = new string[] {stringAliases};
+            }
+            if (bodyBox.Text.Trim().Equals("[Replace with body of email]"))
+            {
+                bodyBox.Font = new Font(UsefulTools.getFontValue(defaultFont, "Name"), float.Parse(UsefulTools.getFontValue(defaultFont, "Size")));
+            }
             htmlSignature = RtfToHtmlConverter.RtfToHtml(rtfSignature).Html;
         }
         private string replaceMergeFields(string toReplace, int recipientNumber)

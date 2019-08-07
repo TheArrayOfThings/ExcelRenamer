@@ -10,7 +10,7 @@ namespace MailMerger_V3
 {
     class SettingsImporter
     {
-        public static void importSettings(ref string rtfSignature, ref ComboBox inboxes)
+        public static void importSettings(ref string rtfSignature, ref ComboBox inboxes, ref string refAliases, ref string defaultFont)
         {
             string[] settingsContents = File.ReadAllLines("Settings.txt");
             for (int i = 0; i < settingsContents.Length; ++i)
@@ -36,6 +36,18 @@ namespace MailMerger_V3
                         rtfSignature += settingsContents[i] + Environment.NewLine;
                         ++i;
                     }
+                }
+                if (settingsContents[i].Equals("****REFALIASESSTART****"))
+                {
+                    ++i;
+                    //Console.WriteLine("Starting reference aliases import...");
+                    refAliases = settingsContents[i].Trim();
+                }
+                if (settingsContents[i].Equals("****DEFAULTFONTSTART****"))
+                {
+                    ++i;
+                    //Console.WriteLine("Starting reference aliases import...");
+                    defaultFont = settingsContents[i].Trim();
                 }
             }
             if (inboxes.Items.Count > 0)
