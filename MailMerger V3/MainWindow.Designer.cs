@@ -176,7 +176,7 @@
             // 
             // clearButton
             // 
-            this.clearButton.Location = new System.Drawing.Point(733, 512);
+            this.clearButton.Location = new System.Drawing.Point(536, 512);
             this.clearButton.Name = "clearButton";
             this.clearButton.Size = new System.Drawing.Size(52, 23);
             this.clearButton.TabIndex = 12;
@@ -222,6 +222,7 @@
             this.bodyBox.ContextMenuStrip = this.emailMenu;
             this.bodyBox.Location = new System.Drawing.Point(373, 115);
             this.bodyBox.Name = "bodyBox";
+            this.bodyBox.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedBoth;
             this.bodyBox.Size = new System.Drawing.Size(412, 391);
             this.bodyBox.TabIndex = 16;
             this.bodyBox.Text = "[Replace with body of email]";
@@ -235,7 +236,7 @@
             this.insertImageToolStripMenuItem,
             this.insertMergeFieldToolStripMenuItem});
             this.emailMenu.Name = "emailMenu";
-            this.emailMenu.Size = new System.Drawing.Size(169, 114);
+            this.emailMenu.Size = new System.Drawing.Size(169, 136);
             // 
             // copyToolStripMenuItem
             // 
@@ -263,6 +264,7 @@
             this.insertImageToolStripMenuItem.Name = "insertImageToolStripMenuItem";
             this.insertImageToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.insertImageToolStripMenuItem.Text = "Insert Image";
+            this.insertImageToolStripMenuItem.Click += new System.EventHandler(this.insertImageToolStripMenuItem_Click);
             // 
             // insertMergeFieldToolStripMenuItem
             // 
@@ -309,7 +311,7 @@
             // sendButton
             // 
             this.sendButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.sendButton.Location = new System.Drawing.Point(537, 512);
+            this.sendButton.Location = new System.Drawing.Point(710, 512);
             this.sendButton.Name = "sendButton";
             this.sendButton.Size = new System.Drawing.Size(75, 23);
             this.sendButton.TabIndex = 20;

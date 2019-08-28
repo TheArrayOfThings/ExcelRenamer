@@ -61,11 +61,14 @@ namespace Rtf2Html
 
             if (!WriteFlowDocument(htmlWriter))
                 return;
-            _htmlResult.Html = htmlStringBuilder.ToString().Replace("<p />", "<br/>");
-            _htmlResult.Html = _htmlResult.Html.Replace("<body>", "");
-            _htmlResult.Html = _htmlResult.Html.Replace("</body>", "");
-            _htmlResult.Html = _htmlResult.Html.Replace("<html>", "");
-            _htmlResult.Html = _htmlResult.Html.Replace("</html>", "");
+            _htmlResult.Html = htmlStringBuilder.ToString();
+            //Fix paragraph tags
+            _htmlResult.Html = _htmlResult.Html.Replace("<p/>", "</span><br/>");
+            _htmlResult.Html = _htmlResult.Html.Replace("<p/ >", "</span><br/>");
+            _htmlResult.Html = _htmlResult.Html.Replace("<p />", "</span><br/>");
+            _htmlResult.Html = _htmlResult.Html.Replace("</ p >", "</span><br/>");
+            _htmlResult.Html = _htmlResult.Html.Replace(Environment.NewLine + "</p>", "");
+            _htmlResult.Html = _htmlResult.Html.Replace("<p", "<span");
             _htmlResult.Html = htmlLinkify(_htmlResult.Html);
         }
 
@@ -554,14 +557,14 @@ namespace Rtf2Html
         }
         private string htmlLinkify(string workString)
         {
-            MatchCollection matches = Regex.Matches(workString, ">([^\\s]+).&lt;([^\\s]+)&gt;<\\/span>");
+            MatchCollection matches = Regex.Matches(workString, "([A-Za-z,;'\".?!\\[\\]\\w\\s\\d])+.&lt;([^\\s]+)&gt;");
             string parsedString = workString;
             string thisMatch = "";
             for (int i = 0; i < matches.Count; ++i)
             {
-                thisMatch = ReplaceFirst(matches[i].ToString(), ">", "");
-                thisMatch = thisMatch.Replace("</span>", "");
+                thisMatch = matches[i].ToString();
                 workString = workString.Replace(thisMatch, "<a href=\"" + extractLink(thisMatch) + "\">" + extractLinkName(thisMatch) + "</a>");
+                
             }
             return workString;
         }

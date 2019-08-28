@@ -28,7 +28,7 @@ namespace MailMerger_V3
             {
                 defaultFontBox.Text = "Font Name=Calibri, Font Size=12";
             }
-            UsefulTools.setMergeFields(new string[] { "Name", "Email", "Job Title" }, insertMergeFieldToolStripMenuItem, signatureBox);
+            UsefulTools.setMergeFields(new string[] {"Name", "Email", "Job Title", "Department", "Phone Number"}, insertMergeFieldToolStripMenuItem, signatureBox);
         }
 
         private void addButton_Click(object sender, EventArgs e)
@@ -65,6 +65,8 @@ namespace MailMerger_V3
             if (inboxesBox.Items.Count > 0 && (!(signatureBox.Text.Trim().Equals(""))))
             {
                 this.DialogResult = DialogResult.OK;
+                signatureBox.SelectAll();
+                signatureBox.SelectionFont = new Font(UsefulTools.getFontValue(defaultFontBox.Text, "Name"), float.Parse(UsefulTools.getFontValue(defaultFontBox.Text, "Size")));
                 exportSettings();
                 this.Close();
             } else
@@ -73,9 +75,32 @@ namespace MailMerger_V3
             }
             
         }
-        private void copyToolStripMenuItem_Click(object sender, EventArgs e)
+
+        //MenuItems events
+
+        private void insertImageToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Clipboard.SetData(DataFormats.Rtf, signatureBox.SelectedRtf);
+            OpenFileDialog getImage = new OpenFileDialog();
+            getImage.Multiselect = false;
+            getImage.Filter = "Image Files | *.png; *.jpeg; *.bmp; *.gif";
+            Image image;
+            if (getImage.ShowDialog() == DialogResult.OK && File.Exists(getImage.FileName))
+            {
+                try
+                {
+                    image = Image.FromFile(getImage.FileName);
+                    Clipboard.SetImage(image);
+                    signatureBox.Paste();
+                }
+                catch (OutOfMemoryException)
+                {
+                    MessageBox.Show("Please select a valid image.", "Invalid Image");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please select a valid image.", "Invalid Image");
+            }
         }
 
         private void hyperlinkToolStripMenuItem_Click(object sender, EventArgs e)
@@ -83,6 +108,17 @@ namespace MailMerger_V3
             string link = Prompt.ShowDialog("Enter link for hyperlink", "Hyperlink");
             UsefulTools.replaceHighlightedRtf("\\cf3\\ul " + signatureBox.SelectedText + " <" + link + ">\\cf7\\ulnone", signatureBox);
         }
+
+        private void copyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetData(DataFormats.Rtf, signatureBox.SelectedRtf);
+        }
+
+        private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            signatureBox.SelectedRtf = Clipboard.GetData(DataFormats.Rtf).ToString();
+        }
+
         private void exportSettings()
         {
             UsefulTools.trimRtf(signatureBox);
@@ -114,7 +150,10 @@ namespace MailMerger_V3
             if (changeFont.ShowDialog() == DialogResult.OK)
             {
                 string fullFont = changeFont.Font.ToString();
-                defaultFontBox.Text = "Font Name=" + UsefulTools.getFontValue(fullFont, "Name") + ", Font Size=" + UsefulTools.getFontValue(fullFont, "Size");
+                defaultFontBox.Text = "Font Name=" + UsefulTools.getFontValue(fullFont, "Name") + ", Font Size=" + Math.Round(float.Parse(UsefulTools.getFontValue(fullFont, "Size")));
+                signatureBox.SelectAll();
+                signatureBox.SelectionFont = new Font(UsefulTools.getFontValue(defaultFontBox.Text, "Name"), float.Parse(UsefulTools.getFontValue(fullFont, "Size")));
+                signatureBox.Select(0, 0);
             }
         }
     }

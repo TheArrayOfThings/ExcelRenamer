@@ -8,7 +8,7 @@ using System.IO;
 
 namespace MailMerger_V3
 {
-    class SettingsImporter
+    static class SettingsImporter
     {
         public static void importSettings(ref string rtfSignature, ref ComboBox inboxes, ref string refAliases, ref string defaultFont)
         {

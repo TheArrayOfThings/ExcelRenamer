@@ -140,31 +140,35 @@
             this.insertImageToolStripMenuItem,
             this.insertMergeFieldToolStripMenuItem});
             this.signatureMenu.Name = "emailMenu";
-            this.signatureMenu.Size = new System.Drawing.Size(169, 114);
+            this.signatureMenu.Size = new System.Drawing.Size(169, 136);
             // 
             // copyToolStripMenuItem
             // 
             this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
             this.copyToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.copyToolStripMenuItem.Text = "Copy";
+            this.copyToolStripMenuItem.Click += new System.EventHandler(this.copyToolStripMenuItem_Click);
             // 
             // pasteToolStripMenuItem
             // 
             this.pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
             this.pasteToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.pasteToolStripMenuItem.Text = "Paste";
+            this.pasteToolStripMenuItem.Click += new System.EventHandler(this.pasteToolStripMenuItem_Click);
             // 
             // hyperlinkToolStripMenuItem
             // 
             this.hyperlinkToolStripMenuItem.Name = "hyperlinkToolStripMenuItem";
             this.hyperlinkToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.hyperlinkToolStripMenuItem.Text = "Hyperlink";
+            this.hyperlinkToolStripMenuItem.Click += new System.EventHandler(this.hyperlinkToolStripMenuItem_Click);
             // 
             // insertImageToolStripMenuItem
             // 
             this.insertImageToolStripMenuItem.Name = "insertImageToolStripMenuItem";
             this.insertImageToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.insertImageToolStripMenuItem.Text = "Insert Image";
+            this.insertImageToolStripMenuItem.Click += new System.EventHandler(this.insertImageToolStripMenuItem_Click);
             // 
             // insertMergeFieldToolStripMenuItem
             // 
@@ -272,12 +276,12 @@
         private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem pasteToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem hyperlinkToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem insertImageToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem insertMergeFieldToolStripMenuItem;
         private System.Windows.Forms.Label referenceLabel;
         private System.Windows.Forms.TextBox refAliasesBox;
         private System.Windows.Forms.Label defaultFontLabel;
         private System.Windows.Forms.Button selectFontButton;
         private System.Windows.Forms.TextBox defaultFontBox;
+        private System.Windows.Forms.ToolStripMenuItem insertImageToolStripMenuItem;
     }
 }
