@@ -33,8 +33,10 @@ namespace MailMerger_V3
 
         private void addButton_Click(object sender, EventArgs e)
         {
-            string inboxToAdd = Prompt.ShowDialog("Enter email address for inbox.", "Inbox details");
-            if (!(inboxToAdd.Trim().Equals("")))
+            ModalPrompt inboxToAddPrompt = new ModalPrompt("Inbox details", "Enter email address for inbox.", false);
+            inboxToAddPrompt.ShowDialog();
+            string inboxToAdd = inboxToAddPrompt.Result;
+            if (inboxToAdd != null && !(String.IsNullOrEmpty(inboxToAdd)))
             {
                 if (UsefulTools.isValidEmail(inboxToAdd.Trim()))
                 {
@@ -105,7 +107,14 @@ namespace MailMerger_V3
 
         private void hyperlinkToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string link = Prompt.ShowDialog("Enter link for hyperlink", "Hyperlink");
+            string link;
+            ModalPrompt linkPrompt = new ModalPrompt("Hyperlink", "Enter link for hyperlink", false);
+            linkPrompt.ShowDialog();
+            link = linkPrompt.Result;
+            if (link != null & String.IsNullOrEmpty(link))
+            {
+                return;
+            }
             UsefulTools.replaceHighlightedRtf("\\cf3\\ul " + signatureBox.SelectedText + " <" + link + ">\\cf7\\ulnone", signatureBox);
         }
 

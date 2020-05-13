@@ -51,18 +51,25 @@ namespace MailMerger_V3
         Font defaultFont;
         //bool signatureContainsSignoff = false;
 
+        //User info
+        string emailAddress;
+        string firstName;
+        string jobTitle;
+        string department;
+        string phoneNumber;
+
         public main()
         {
             InitializeComponent();
             logBox.SelectAll();
             logBox.SelectionAlignment = HorizontalAlignment.Center;
+            //Get the email address
+            inboxes.Items.Add(getEmail());
             //EWS setup
             service.UseDefaultCredentials = true;
             startAutoDiscover = new Thread(autoDiscoverThread);
             startAutoDiscover.IsBackground = true;
             startAutoDiscover.Start();
-            //Import settings etc
-            inboxes.Items.Add(getEmail());
             if (File.Exists("Settings.txt"))
             {
                 importSettings();
@@ -215,11 +222,16 @@ namespace MailMerger_V3
         }
         private void writeLog(string toWrite)
         {
-            logBox.Text = logBox.Text + toWrite + Environment.NewLine + Environment.NewLine;
-            logBox.SelectAll();
-            logBox.SelectionAlignment = HorizontalAlignment.Center;
-            logBox.Select(logBox.Text.Length - 1, 1);
-            logBox.ScrollToCaret();
+            logBox.Invoke((Action)delegate
+
+            {
+
+                logBox.Text = logBox.Text + toWrite + Environment.NewLine + Environment.NewLine;
+                logBox.SelectAll();
+                logBox.SelectionAlignment = HorizontalAlignment.Center;
+                logBox.Select(logBox.Text.Length - 1, 1);
+                logBox.ScrollToCaret();
+            });
         }
         private static  void writeErrors(string toWrite)
         {
@@ -386,8 +398,62 @@ namespace MailMerger_V3
         }
         private void autoDiscoverThread()
         {
-            service.AutodiscoverUrl(getEmail());
-            autoDiscoverFinished = true;
+            while (initialiseSuccess == false)
+            {
+                Thread.Sleep(500);
+            }
+            try
+            {
+                service.AutodiscoverUrl(getEmail(), autoDiscoverOverload);
+                autoDiscoverFinished = true;
+                writeLog("Finished configuring your Exchange profile!");
+            } catch (Exception)
+            {
+                string password = "";
+                while (password == null || String.IsNullOrEmpty(password))
+                {
+                    this.Invoke((Action)(() => { 
+                    
+                    ModalPrompt passwordPrompt = new ModalPrompt("Password", "Enter your password", true);
+                    passwordPrompt.ShowDialog();
+                    password = passwordPrompt.Result;
+                    if (password == null)
+                    {
+                        Application.Exit();
+                        Environment.Exit(0);
+                    }
+                    }));
+                }
+                service.UseDefaultCredentials = false;
+                service.Credentials = new WebCredentials(emailAddress, password);
+                try
+                {
+                    service.AutodiscoverUrl(getEmail(), autoDiscoverOverload);
+                    autoDiscoverFinished = true;
+                    writeLog("Finished configuring your Exchange profile!");
+                } catch (Exception e)
+                {
+                    MessageBox.Show("Error!: " + e.Message + ". Unable to login to Exchange profile!");
+                    Application.Exit();
+                    Environment.Exit(0);
+                }
+            }
+            
+        }
+
+        private bool autoDiscoverOverload(string redirectionUrl)
+        {
+            // The default for the validation callback is to reject the URL.
+            bool result = false;
+            Uri redirectionUri = new Uri(redirectionUrl);
+            // Validate the contents of the redirection URL. In this simple validation
+            // callback, the redirection URL is considered valid if it is using HTTPS
+            // to encrypt the authentication credentials. 
+            if (redirectionUri.Scheme == "https")
+            {
+                result = true;
+            }
+            return result;
         }
         private EmailMessage createEmail(string[] recipientData, int recipientNumber)
         {
@@ -449,7 +515,14 @@ namespace MailMerger_V3
 
         private void hyperlinkToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string link = Prompt.ShowDialog("Enter link for hyperlink", "Hyperlink");
+            string link;
+            ModalPrompt linkPrompt = new ModalPrompt("Hyperlink", "Enter link for hyperlink", false);
+            linkPrompt.ShowDialog();
+            link = linkPrompt.Result;
+            if(link != null & String.IsNullOrEmpty(link))
+            {
+                return;
+            }
             UsefulTools.replaceHighlightedRtf("\\cf3\\ul " + bodyBox.SelectedText + " <" + link + ">\\cf7\\ulnone", bodyBox);
         }
 
@@ -623,70 +696,127 @@ namespace MailMerger_V3
             errors = "";
         }
 
-        private static string getName()
+        private string getName()
         {
-            return System.DirectoryServices.AccountManagement.UserPrincipal.Current.DisplayName;
+            if (String.IsNullOrEmpty(firstName))
+            {
+                while (!autoDiscoverFinished)
+                {
+                    Thread.Sleep(100);
+                }
+                try
+                {
+                    firstName = service.ResolveName(getEmail().Substring(0, getEmail().IndexOf('@')), ResolveNameSearchLocation.DirectoryOnly, true)[0].Contact.DisplayName;
+                }
+                catch (Exception)
+                {
+                    while (firstName == null || String.IsNullOrEmpty(firstName.Trim()))
+                    {
+                        ModalPrompt firstNamePrompt = new ModalPrompt("Name Required", "Name not found! Please enter your name.", false);
+                        firstNamePrompt.ShowDialog();
+                        firstName = firstNamePrompt.Result;
+                    }
+                }
+            }
+            return firstName;
         }
 
-        private static string getEmail()
+        private  string getEmail()
         {
-            return System.DirectoryServices.AccountManagement.UserPrincipal.Current.EmailAddress;
+            if (String.IsNullOrEmpty(emailAddress))
+            {
+                try
+                {
+                    emailAddress = System.DirectoryServices.AccountManagement.UserPrincipal.Current.EmailAddress;
+                    while (String.IsNullOrEmpty(emailAddress))
+                    {
+                        ModalPrompt emailPrompt = new ModalPrompt("Email Address", "Please provide your email address", false);
+                        emailPrompt.ShowDialog();
+                        emailAddress = emailPrompt.Result;
+                        if (emailAddress == null)
+                        {
+                            Application.Exit();
+                            Environment.Exit(0);
+                        }
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("Error: " + e.Message + ".");
+                }
+            }
+            return emailAddress;
         }
 
         private string getJob()
         {
-            string jobTitle = "";
-            while (!autoDiscoverFinished)
+            if (String.IsNullOrEmpty(jobTitle))
             {
-                Thread.Sleep(100);
-            }
-            try {
-                jobTitle = service.ResolveName(getEmail().Substring(0, getEmail().IndexOf('@')), ResolveNameSearchLocation.DirectoryOnly, true)[0].Contact.JobTitle;
-            } catch (Exception)
-            {
-                while (String.IsNullOrEmpty(jobTitle.Trim()))
+                while (!autoDiscoverFinished)
                 {
-                    jobTitle = Prompt.ShowDialog("Job title not found! Please enter your job title.", "Job Title Required");
+                    Thread.Sleep(100);
+                }
+                try
+                {
+                    jobTitle = service.ResolveName(getEmail().Substring(0, getEmail().IndexOf('@')), ResolveNameSearchLocation.DirectoryOnly, true)[0].Contact.JobTitle;
+                }
+                catch (Exception)
+                {
+                    while (jobTitle == null || String.IsNullOrEmpty(jobTitle.Trim()))
+                    {
+                        ModalPrompt jobPrompt = new ModalPrompt("Job Title Required", "Job title not found! Please enter your job title.", false);
+                        jobPrompt.ShowDialog();
+                        jobTitle = jobPrompt.Result;
+                    }
                 }
             }
             return jobTitle;
         }
         private string getPhone()
         {
-            string phone = "";
-            while (!autoDiscoverFinished)
+            if (String.IsNullOrEmpty(phoneNumber))
             {
-                Thread.Sleep(100);
-            }
-            try
-            {
-                phone = service.ResolveName(getEmail().Substring(0, getEmail().IndexOf('@')), ResolveNameSearchLocation.DirectoryOnly, true)[0].Contact.PhoneNumbers[PhoneNumberKey.BusinessPhone];
-            }
-            catch (Exception)
-            {
-                while (String.IsNullOrEmpty(phone.Trim()))
+                while (!autoDiscoverFinished)
                 {
-                    phone = Prompt.ShowDialog("Phone number not found! Please enter your phone number.", "Phone number Required");
+                    Thread.Sleep(100);
+                }
+                try
+                {
+                    phoneNumber = service.ResolveName(getEmail().Substring(0, getEmail().IndexOf('@')), ResolveNameSearchLocation.DirectoryOnly, true)[0].Contact.PhoneNumbers[PhoneNumberKey.BusinessPhone];
+                }
+                catch (Exception)
+                {
+                    while (phoneNumber == null || String.IsNullOrEmpty(phoneNumber.Trim()))
+                    {
+                        ModalPrompt phonePrompt = new ModalPrompt("Phone number Required", "Phone number not found! Please enter your phone number.", false);
+                        phonePrompt.ShowDialog();
+                        phoneNumber = phonePrompt.Result;
+                    }
                 }
             }
-            return phone;
+            return phoneNumber;
         }
         private string getDepartment()
         {
-            string department = "";
-            while (!autoDiscoverFinished)
+            if (String.IsNullOrEmpty(department))
             {
-                Thread.Sleep(100);
-            }
-            try
-            {
-                department = service.ResolveName(getEmail().Substring(0, getEmail().IndexOf('@')), ResolveNameSearchLocation.DirectoryOnly, true)[0].Contact.Department;
-            }
-            catch (Exception)
-            {
-                while (String.IsNullOrEmpty(department.Trim()))
+                while (!autoDiscoverFinished)
                 {
-                    department = Prompt.ShowDialog("Department not found! Please enter your department.", "Department Required");
+                    Thread.Sleep(100);
+                }
+                try
+                {
+                    department = service.ResolveName(getEmail().Substring(0, getEmail().IndexOf('@')), ResolveNameSearchLocation.DirectoryOnly, true)[0].Contact.Department;
+                }
+                catch (Exception)
+                {
+                    while (department == null || String.IsNullOrEmpty(department.Trim()))
+                    {
+                        ModalPrompt departmentPrompt = new ModalPrompt("Department Required", "Department not found! Please enter your department.", false);
+                        departmentPrompt.ShowDialog();
+                        department = departmentPrompt.Result;
+                    }
                 }
             }
             return department;
