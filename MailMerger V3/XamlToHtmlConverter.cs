@@ -1,6 +1,4 @@
-﻿// adapted from https://github.com/mmanela/MarkupConverter
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -8,23 +6,30 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
-using System.Xml;
 using System.Text.RegularExpressions;
+using System.Xml;
+
+// adapted from https://github.com/mmanela/MarkupConverter
 
 namespace Rtf2Html
 {
     internal class XamlToHtmlConverter
     {
-        private ZipArchive _zip;
-        private XmlTextReader _xamlReader;
-        private HtmlResult _htmlResult;
         private string _contentUriPrefix = string.Empty;
+        private HtmlResult _htmlResult;
+        private XmlTextReader _xamlReader;
+        private ZipArchive _zip;
+
+        public XamlToHtmlConverter()
+        {
+            AsFullDocument = true;
+        }
 
         public bool AsFullDocument { get; set; }
 
         public string ContentUriPrefix
         {
-            get { return _contentUriPrefix; }
+            get => _contentUriPrefix;
             set
             {
                 _contentUriPrefix = value ?? string.Empty;
@@ -32,8 +37,6 @@ namespace Rtf2Html
                     _contentUriPrefix += "/";
             }
         }
-
-        public XamlToHtmlConverter() { AsFullDocument = true; }
 
         public HtmlResult ConvertXamlToHtml(MemoryStream xamlPackageStream)
         {
@@ -101,7 +104,7 @@ namespace Rtf2Html
             if (AsFullDocument)
             {
                 htmlWriter.WriteStartElement("html");
-                
+
                 WriteHead(htmlWriter);
 
                 htmlWriter.WriteStartElement("body");
@@ -122,12 +125,12 @@ namespace Rtf2Html
         private static void WriteHead(XmlWriter htmlWriter)
         {
             htmlWriter.WriteStartElement("head");
-            
+
             htmlWriter.WriteStartElement("meta");
             htmlWriter.WriteAttributeString("http-equiv", "Content-Type");
             htmlWriter.WriteAttributeString("content", "text/html; charset=UTF-8");
             htmlWriter.WriteEndElement();
-            
+
             htmlWriter.WriteEndElement();
         }
 
@@ -172,7 +175,9 @@ namespace Rtf2Html
                         css = "color:" + ParseXamlColor(_xamlReader.Value) + ";";
                         break;
                     case "TextDecorations":
-                        css = _xamlReader.Value.ToLower() == "strikethrough" ? "text-decoration:line-through;" : "text-decoration:underline;";
+                        css = _xamlReader.Value.ToLower() == "strikethrough"
+                            ? "text-decoration:line-through;"
+                            : "text-decoration:underline;";
                         break;
                     case "TextEffects":
                         break;
@@ -269,15 +274,13 @@ namespace Rtf2Html
 
         private static string ParseXamlThickness(string thickness)
         {
-            Double value;
+            double value;
             var values = thickness.Split(',');
             for (var i = 0; i < values.Length; i++)
-            {
                 if (double.TryParse(values[i], NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out value))
                     values[i] = Math.Ceiling(value).ToString(CultureInfo.InvariantCulture);
                 else
                     values[i] = "1";
-            }
 
             string cssThickness;
             switch (values.Length)
@@ -315,12 +318,13 @@ namespace Rtf2Html
             else
             {
                 while (ReadNextToken() && _xamlReader.NodeType != XmlNodeType.EndElement)
-                {
                     switch (_xamlReader.NodeType)
                     {
                         case XmlNodeType.Element:
                             if (_xamlReader.Name.Contains("."))
+                            {
                                 AddComplexProperty(htmlWriter, inlineStyle);
+                            }
                             else
                             {
                                 if (htmlWriter != null && !elementContentStarted && inlineStyle.Length > 0)
@@ -329,10 +333,13 @@ namespace Rtf2Html
                                     htmlWriter.WriteAttributeString("style", inlineStyle.ToString());
                                     inlineStyle.Remove(0, inlineStyle.Length);
                                 }
+
                                 elementContentStarted = true;
                                 WriteElement(htmlWriter, inlineStyle);
                             }
-                            Debug.Assert(_xamlReader.NodeType == XmlNodeType.EndElement || _xamlReader.NodeType == XmlNodeType.Element && _xamlReader.IsEmptyElement);
+
+                            Debug.Assert(_xamlReader.NodeType == XmlNodeType.EndElement ||
+                                         _xamlReader.NodeType == XmlNodeType.Element && _xamlReader.IsEmptyElement);
                             break;
                         case XmlNodeType.Comment:
                             if (htmlWriter != null)
@@ -342,8 +349,10 @@ namespace Rtf2Html
                                     htmlWriter.WriteAttributeString("style", inlineStyle.ToString());
                                     inlineStyle.Remove(0, inlineStyle.Length);
                                 }
+
                                 htmlWriter.WriteComment(_xamlReader.Value);
                             }
+
                             elementContentStarted = true;
                             break;
                         case XmlNodeType.CDATA:
@@ -356,12 +365,13 @@ namespace Rtf2Html
                                     htmlWriter.WriteAttributeString("style", inlineStyle.ToString());
                                     inlineStyle.Remove(0, inlineStyle.Length);
                                 }
+
                                 htmlWriter.WriteString(_xamlReader.Value);
                             }
+
                             elementContentStarted = true;
                             break;
                     }
-                }
 
                 Debug.Assert(_xamlReader.NodeType == XmlNodeType.EndElement);
             }
@@ -372,7 +382,6 @@ namespace Rtf2Html
             Debug.Assert(_xamlReader.NodeType == XmlNodeType.Element);
 
             if (htmlWriter != null && _xamlReader.Name == "Image.Source")
-            {
                 if (ReadNextToken() && _xamlReader.Name == "BitmapImage")
                 {
                     var imageUri = _xamlReader.GetAttribute("UriSource");
@@ -386,10 +395,13 @@ namespace Rtf2Html
                             using (var stream = imageEntry.Open())
                             {
                                 var image = ToByteArray(stream);
-                                var identicalContent = _htmlResult.Content.FirstOrDefault(kvp => image.SequenceEqual(kvp.Value));
+                                var identicalContent =
+                                    _htmlResult.Content.FirstOrDefault(kvp => image.SequenceEqual(kvp.Value));
                                 var isIdentical = !default(KeyValuePair<string, byte[]>).Equals(identicalContent);
                                 if (isIdentical)
+                                {
                                     imageUri = identicalContent.Key;
+                                }
                                 else
                                 {
                                     imageUri = string.Concat(ContentUriPrefix, imageUri).Replace("/./", "/");
@@ -412,11 +424,10 @@ namespace Rtf2Html
                         return;
                     }
                 }
-            }
 
             if (inlineStyle != null && _xamlReader.Name.EndsWith(".TextDecorations"))
                 inlineStyle.Append("text-decoration:underline;");
-            
+
             // Skip the element representing the complex property
             WriteElementContent(null, null);
         }
@@ -475,7 +486,8 @@ namespace Rtf2Html
                         break;
                     case "List":
                         var marker = _xamlReader.GetAttribute("MarkerStyle");
-                        if (marker == null || marker == "None" || marker == "Disc" || marker == "Circle" || marker == "Square" || marker == "Box")
+                        if (marker == null || marker == "None" || marker == "Disc" || marker == "Circle" ||
+                            marker == "Square" || marker == "Box")
                             htmlElementName = "ul";
                         else
                             htmlElementName = "ol";
@@ -513,7 +525,8 @@ namespace Rtf2Html
         {
             while (_xamlReader.Read())
             {
-                Debug.Assert(_xamlReader.ReadState == ReadState.Interactive, "Reader is expected to be in Interactive state (" + _xamlReader.ReadState + ")");
+                Debug.Assert(_xamlReader.ReadState == ReadState.Interactive,
+                    "Reader is expected to be in Interactive state (" + _xamlReader.ReadState + ")");
                 switch (_xamlReader.NodeType)
                 {
                     case XmlNodeType.Element:
@@ -542,6 +555,7 @@ namespace Rtf2Html
                         return true;
                 }
             }
+
             return false;
         }
 
@@ -555,39 +569,41 @@ namespace Rtf2Html
                 return memoryStream.ToArray();
             }
         }
+
         private string htmlLinkify(string workString)
         {
-            MatchCollection matches = Regex.Matches(workString, "([A-Za-z,;'\".?!\\[\\]\\w\\s\\d])+.&lt;([^\\s]+)&gt;");
-            string parsedString = workString;
-            string thisMatch = "";
-            for (int i = 0; i < matches.Count; ++i)
+            var matches = Regex.Matches(workString, "([A-Za-z,;'\".?!\\[\\]\\w\\s\\d])+.&lt;([^\\s]+)&gt;");
+            var parsedString = workString;
+            var thisMatch = "";
+            for (var i = 0; i < matches.Count; ++i)
             {
                 thisMatch = matches[i].ToString();
-                workString = workString.Replace(thisMatch, "<a href=\"" + extractLink(thisMatch) + "\">" + extractLinkName(thisMatch) + "</a>");
-                
+                workString = workString.Replace(thisMatch,
+                    "<a href=\"" + extractLink(thisMatch) + "\">" + extractLinkName(thisMatch) + "</a>");
             }
+
             return workString;
         }
+
         private string extractLink(string toExtract)
         {
-            int linkStartIndex = toExtract.IndexOf("&lt;") + 4;
-            int linkEndIndex = toExtract.IndexOf("&gt;");
-            int linkLength = linkEndIndex - linkStartIndex;
+            var linkStartIndex = toExtract.IndexOf("&lt;") + 4;
+            var linkEndIndex = toExtract.IndexOf("&gt;");
+            var linkLength = linkEndIndex - linkStartIndex;
             return toExtract.Substring(linkStartIndex, linkLength);
         }
+
         private string extractLinkName(string toExtract)
         {
-            int linkEndIndex = toExtract.IndexOf("&lt;");
-            int linkLength = linkEndIndex;
+            var linkEndIndex = toExtract.IndexOf("&lt;");
+            var linkLength = linkEndIndex;
             return toExtract.Substring(0, linkLength);
         }
+
         private string ReplaceFirst(string searchText, string search, string replace)
         {
-            int pos = searchText.IndexOf(search);
-            if (pos < 0)
-            {
-                return searchText;
-            }
+            var pos = searchText.IndexOf(search);
+            if (pos < 0) return searchText;
             return searchText.Substring(0, pos) + replace + searchText.Substring(pos + search.Length);
         }
     }

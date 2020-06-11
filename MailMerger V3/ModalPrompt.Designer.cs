@@ -40,7 +40,7 @@
             this.OkButton.Location = new System.Drawing.Point(306, 80);
             this.OkButton.Name = "OkButton";
             this.OkButton.Size = new System.Drawing.Size(104, 29);
-            this.OkButton.TabIndex = 0;
+            this.OkButton.TabIndex = 2;
             this.OkButton.Text = "OK";
             this.OkButton.UseVisualStyleBackColor = true;
             this.OkButton.Click += new System.EventHandler(this.OkButton_Click);
@@ -51,7 +51,7 @@
             this.captionLabel.Location = new System.Drawing.Point(13, 13);
             this.captionLabel.Name = "captionLabel";
             this.captionLabel.Size = new System.Drawing.Size(56, 17);
-            this.captionLabel.TabIndex = 1;
+            this.captionLabel.TabIndex = 3;
             this.captionLabel.Text = "Caption";
             // 
             // inputBox
@@ -61,7 +61,7 @@
             this.inputBox.Location = new System.Drawing.Point(16, 46);
             this.inputBox.Name = "inputBox";
             this.inputBox.Size = new System.Drawing.Size(393, 22);
-            this.inputBox.TabIndex = 2;
+            this.inputBox.TabIndex = 1;
             this.inputBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.inputBox_KeyPress);
             // 
             // ModalPrompt

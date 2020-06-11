@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 
@@ -20,31 +15,31 @@ namespace MailMerger_V3
             {
                 string rtfSignature = "", referenceAliases = "", defaultFont = "";
 
-                SettingsImporter.importSettings(ref rtfSignature, ref inboxesBox, ref referenceAliases, ref defaultFont);
+                SettingsImporter.ImportSettings(ref rtfSignature, ref inboxesBox, ref referenceAliases, ref defaultFont);
                 refAliasesBox.Text = referenceAliases;
                 defaultFontBox.Text = defaultFont;
                 signatureBox.Rtf = rtfSignature;
             } else
             {
-                defaultFontBox.Text = "Font Name=Calibri, Font Size=12";
+                defaultFontBox.Text = @"Font Name=Calibri, Font Size=12";
             }
-            UsefulTools.setMergeFields(new string[] {"Name", "Email", "Job Title", "Department", "Phone Number"}, insertMergeFieldToolStripMenuItem, signatureBox);
+            UsefulTools.SetMergeFields(new[] {"Name", "Email", "Job Title", "Department", "Phone Number"}, insertMergeFieldToolStripMenuItem, signatureBox);
         }
 
         private void addButton_Click(object sender, EventArgs e)
         {
-            ModalPrompt inboxToAddPrompt = new ModalPrompt("Inbox details", "Enter email address for inbox.", false);
+            ModalPrompt inboxToAddPrompt = new ModalPrompt("Inbox details", "Enter email address for inbox.");
             inboxToAddPrompt.ShowDialog();
             string inboxToAdd = inboxToAddPrompt.Result;
             if (inboxToAdd != null && !(String.IsNullOrEmpty(inboxToAdd)))
             {
-                if (UsefulTools.isValidEmail(inboxToAdd.Trim()))
+                if (UsefulTools.IsValidEmail(inboxToAdd.Trim()))
                 {
                     inboxesBox.Items.Add(inboxToAdd.Trim());
                     inboxesBox.SelectedItem = inboxesBox.Items[inboxesBox.Items.Count - 1];
                 } else
                 {
-                    MessageBox.Show("The email address you entered is invalid.", "Invalid Email Address");
+                    MessageBox.Show(@"The email address you entered is invalid.", @"Invalid Email Address");
                 }
             }
         }
@@ -64,27 +59,31 @@ namespace MailMerger_V3
 
         private void submitButton_Click(object sender, EventArgs e)
         {
-            if (inboxesBox.Items.Count > 0 && (!(signatureBox.Text.Trim().Equals(""))))
+            if (inboxesBox.Items.Count < 1)
+            {
+                MessageBox.Show(@"You need to add at least one inbox.", @"Inbox missing");
+            } else if (signatureBox.Text.Trim().Equals(""))
+            {
+                MessageBox.Show(@"Signature is blank.", @"Blank signature");
+            } else
             {
                 this.DialogResult = DialogResult.OK;
                 signatureBox.SelectAll();
-                signatureBox.SelectionFont = new Font(UsefulTools.getFontValue(defaultFontBox.Text, "Name"), float.Parse(UsefulTools.getFontValue(defaultFontBox.Text, "Size")));
-                exportSettings();
+                signatureBox.SelectionFont = new Font(UsefulTools.GetFontValue(defaultFontBox.Text, "Name"), float.Parse(UsefulTools.GetFontValue(defaultFontBox.Text, "Size")));
+                ExportSettings();
                 this.Close();
-            } else
-            {
-                MessageBox.Show("You need to add at least one inbox.", "Inbox missing");
-            }
-            
+            }            
         }
 
         //MenuItems events
 
         private void insertImageToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            OpenFileDialog getImage = new OpenFileDialog();
-            getImage.Multiselect = false;
-            getImage.Filter = "Image Files | *.png; *.jpeg; *.bmp; *.gif";
+            OpenFileDialog getImage = new OpenFileDialog
+            {
+                Multiselect = false,
+                Filter = @"Image Files | *.png; *.jpeg; *.bmp; *.gif"
+            };
             Image image;
             if (getImage.ShowDialog() == DialogResult.OK && File.Exists(getImage.FileName))
             {
@@ -96,26 +95,25 @@ namespace MailMerger_V3
                 }
                 catch (OutOfMemoryException)
                 {
-                    MessageBox.Show("Please select a valid image.", "Invalid Image");
+                    MessageBox.Show(@"Please select a valid image.", @"Invalid Image");
                 }
             }
             else
             {
-                MessageBox.Show("Please select a valid image.", "Invalid Image");
+                MessageBox.Show(@"Please select a valid image.", @"Invalid Image");
             }
         }
 
         private void hyperlinkToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string link;
-            ModalPrompt linkPrompt = new ModalPrompt("Hyperlink", "Enter link for hyperlink", false);
+            ModalPrompt linkPrompt = new ModalPrompt("Hyperlink", "Enter link for hyperlink");
             linkPrompt.ShowDialog();
-            link = linkPrompt.Result;
+            string link = linkPrompt.Result;
             if (link != null & String.IsNullOrEmpty(link))
             {
                 return;
             }
-            UsefulTools.replaceHighlightedRtf("\\cf3\\ul " + signatureBox.SelectedText + " <" + link + ">\\cf7\\ulnone", signatureBox);
+            UsefulTools.ReplaceHighlightedRtf("\\cf3\\ul " + signatureBox.SelectedText + " <" + link + ">\\cf7\\ulnone", signatureBox);
         }
 
         private void copyToolStripMenuItem_Click(object sender, EventArgs e)
@@ -128,11 +126,10 @@ namespace MailMerger_V3
             signatureBox.SelectedRtf = Clipboard.GetData(DataFormats.Rtf).ToString();
         }
 
-        private void exportSettings()
+        private void ExportSettings()
         {
-            UsefulTools.trimRtf(signatureBox);
-            string toWrite = "";
-            toWrite = "****INBOXSTART****" + Environment.NewLine;
+            UsefulTools.TrimRtf(signatureBox);
+            string toWrite = "****INBOXSTART****" + Environment.NewLine;
             foreach (string inbox in inboxesBox.Items)
             {
                 toWrite += inbox + Environment.NewLine;
@@ -145,7 +142,7 @@ namespace MailMerger_V3
             toWrite += (refAliasesBox.Text.Trim() + Environment.NewLine);
             toWrite += ("****REFALIASESEND****" + Environment.NewLine);
             toWrite += ("****DEFAULTFONTSTART****" + Environment.NewLine);
-            toWrite += (defaultFontBox.Text.ToString().Trim() + Environment.NewLine);
+            toWrite += (defaultFontBox.Text.Trim() + Environment.NewLine);
             toWrite += ("****DEFAULTFONTEND****" + Environment.NewLine);
             FileStream settingsFile = File.Create("Settings.txt");
             byte[] toWriteBytes = new UTF8Encoding(true).GetBytes(toWrite);
@@ -159,9 +156,9 @@ namespace MailMerger_V3
             if (changeFont.ShowDialog() == DialogResult.OK)
             {
                 string fullFont = changeFont.Font.ToString();
-                defaultFontBox.Text = "Font Name=" + UsefulTools.getFontValue(fullFont, "Name") + ", Font Size=" + Math.Round(float.Parse(UsefulTools.getFontValue(fullFont, "Size")));
+                defaultFontBox.Text = @"Font Name=" + UsefulTools.GetFontValue(fullFont, "Name") + @", Font Size=" + Math.Round(float.Parse(UsefulTools.GetFontValue(fullFont, "Size")));
                 signatureBox.SelectAll();
-                signatureBox.SelectionFont = new Font(UsefulTools.getFontValue(defaultFontBox.Text, "Name"), float.Parse(UsefulTools.getFontValue(fullFont, "Size")));
+                signatureBox.SelectionFont = new Font(UsefulTools.GetFontValue(defaultFontBox.Text, "Name"), float.Parse(UsefulTools.GetFontValue(fullFont, "Size")));
                 signatureBox.Select(0, 0);
             }
         }

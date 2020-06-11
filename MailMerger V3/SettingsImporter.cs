@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 
@@ -10,7 +6,7 @@ namespace MailMerger_V3
 {
     static class SettingsImporter
     {
-        public static void importSettings(ref string rtfSignature, ref ComboBox inboxes, ref string refAliases, ref string defaultFont)
+        public static void ImportSettings(ref string rtfSignature, ref ComboBox inboxes, ref string refAliases, ref string defaultFont)
         {
             string[] settingsContents = File.ReadAllLines("Settings.txt");
             for (int i = 0; i < settingsContents.Length; ++i)

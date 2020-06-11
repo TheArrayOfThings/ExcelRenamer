@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Net.Mail;
-using System.Drawing;
 
 namespace MailMerger_V3
 {
@@ -14,38 +12,38 @@ namespace MailMerger_V3
             // Loop through all instances of the string 'text'.
             int count = 0;
             int i = 0;
-            while ((i = text.IndexOf(pattern, i)) != -1)
+            while ((i = text.IndexOf(pattern, i, StringComparison.Ordinal)) != -1)
             {
                 i += pattern.Length;
                 count++;
             }
             return count;
         }
-        public static void replaceHighlightedRtf(string toAdd, RichTextBox toReplace)
+        public static void ReplaceHighlightedRtf(string toAdd, RichTextBox toReplace)
         {
             toReplace.SelectedRtf = "{\\rtf1" + toAdd + "}}";
         }
-        public static void setMergeFields(String[] toSet, ToolStripMenuItem mainMenu, RichTextBox relevantBox)
+        public static void SetMergeFields(String[] toSet, ToolStripMenuItem mainMenu, RichTextBox relevantBox)
         {
-            for (int i = 0; i < toSet.Length; ++i)
+            foreach (string eachString in toSet)
             {
-                ToolStripMenuItem newItem = new ToolStripMenuItem(toSet[i]);
-                newItem.Click += new System.EventHandler((sender, e) => insertMergeField(sender, e, relevantBox));
+                ToolStripMenuItem newItem = new ToolStripMenuItem(eachString);
+                newItem.Click += new System.EventHandler((sender, e) => InsertMergeField(sender, relevantBox));
                 mainMenu.DropDownItems.Add(newItem);
             }
         }
-        private static void insertMergeField(object sender, System.EventArgs e, RichTextBox relevantBox)
+        private static void InsertMergeField(object sender, RichTextBox relevantBox)
         {
             relevantBox.SelectedRtf = "{\\rtf1" + "[[" + sender + "]]" + "}}";
         }
-        public static string grabImgSRC(int startIndex, string toGrab)
+        public static string GrabImgSrc(int startIndex, string toGrab)
         {
-            int srcIndex = toGrab.IndexOf("src=", startIndex) + 4;
-            int srcEnd = toGrab.IndexOf("/>", srcIndex);
+            int srcIndex = toGrab.IndexOf("src=", startIndex, StringComparison.Ordinal) + 4;
+            int srcEnd = toGrab.IndexOf("/>", srcIndex, StringComparison.Ordinal);
             int imgTagLength = (srcEnd - srcIndex) - 2;
             return toGrab.Substring(srcIndex, imgTagLength);
         }
-        public static bool findMatch(string toCheck, string[] matchArray)
+        public static bool FindMatch(string toCheck, string[] matchArray)
         {
             foreach (string eachString in matchArray)
             {
@@ -62,27 +60,27 @@ namespace MailMerger_V3
         }
         public static string ReplaceFirst(string searchText, string search, string replace)
         {
-            int pos = searchText.IndexOf(search);
+            int pos = searchText.IndexOf(search, StringComparison.Ordinal);
             if (pos < 0)
             {
                 return searchText;
             }
             return searchText.Substring(0, pos) + replace + searchText.Substring(pos + search.Length);
         }
-        public static void trimRtf(RichTextBox toTrim)
+        public static void TrimRtf(RichTextBox toTrim)
         {
             while (toTrim.Text.EndsWith("\n"))
             {
-                toTrim.Select(toTrim.Text.LastIndexOf("\n"), 2);
+                toTrim.Select(toTrim.Text.LastIndexOf("\n", StringComparison.Ordinal), 2);
                 toTrim.SelectedRtf = "";
             }
             while (toTrim.Text.StartsWith("\n"))
             {
-                toTrim.Select(toTrim.Text.IndexOf("\n"), 1);
+                toTrim.Select(toTrim.Text.IndexOf("\n", StringComparison.Ordinal), 1);
                 toTrim.SelectedRtf = "";
             }
         }
-        public static bool isValidEmail(string toCheck)
+        public static bool IsValidEmail(string toCheck)
         {
             try
             {
@@ -94,10 +92,10 @@ namespace MailMerger_V3
                 return false;
             }
         }
-        public static string getFontValue(string toParse, string attributeName)
+        public static string GetFontValue(string toParse, string attributeName)
         {
-            int startIndex = toParse.IndexOf(attributeName) + attributeName.Length + 1;
-            int endIndex = 0;
+            int startIndex = toParse.IndexOf(attributeName, StringComparison.Ordinal) + attributeName.Length + 1;
+            int endIndex;
             if (toParse.IndexOf(',', startIndex) == -1)
             {
                 endIndex = toParse.Length;

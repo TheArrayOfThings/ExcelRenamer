@@ -1,13 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Input;
 
 namespace MailMerger_V3
 {
@@ -15,19 +7,14 @@ namespace MailMerger_V3
     {
         public string Result { set; get; }
         string title, caption;
-        bool isPassword;
-        public ModalPrompt(string titlePara, string captionPara, bool isPasswordPara)
+        public ModalPrompt(string titlePara, string captionPara)
         {
             InitializeComponent();
             title = titlePara;
             caption = captionPara;
-            isPassword = isPasswordPara;
             captionLabel.Text = caption;
             this.Text = title;
-            if (isPassword)
-            {
-                inputBox.PasswordChar = '*';
-            }
+            Result = null;
         }
 
         private void inputBox_KeyPress(object sender, KeyPressEventArgs e)

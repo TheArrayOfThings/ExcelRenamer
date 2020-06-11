@@ -120,7 +120,7 @@
             this.previousButton.TabIndex = 6;
             this.previousButton.Text = "<";
             this.previousButton.UseVisualStyleBackColor = true;
-            this.previousButton.Click += new System.EventHandler(this.previousButton_Click);
+            this.previousButton.Click += new System.EventHandler(this.PreviousButton_Click);
             // 
             // nextButton
             // 
@@ -130,7 +130,7 @@
             this.nextButton.TabIndex = 7;
             this.nextButton.Text = ">";
             this.nextButton.UseVisualStyleBackColor = true;
-            this.nextButton.Click += new System.EventHandler(this.nextButton_Click);
+            this.nextButton.Click += new System.EventHandler(this.NextButton_Click);
             // 
             // inboxLabel
             // 
@@ -182,7 +182,7 @@
             this.clearButton.TabIndex = 12;
             this.clearButton.Text = "Clear";
             this.clearButton.UseVisualStyleBackColor = true;
-            this.clearButton.Click += new System.EventHandler(this.clearButton_Click);
+            this.clearButton.Click += new System.EventHandler(this.ClearButton_Click);
             // 
             // addButton
             // 
@@ -295,7 +295,7 @@
             this.importButton.TabIndex = 18;
             this.importButton.Text = "Import";
             this.importButton.UseVisualStyleBackColor = true;
-            this.importButton.Click += new System.EventHandler(this.importButton_Click);
+            this.importButton.Click += new System.EventHandler(this.ImportButton_Click);
             // 
             // previewButton
             // 
