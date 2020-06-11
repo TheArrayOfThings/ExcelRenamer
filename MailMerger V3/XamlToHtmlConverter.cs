@@ -599,12 +599,5 @@ namespace Rtf2Html
             var linkLength = linkEndIndex;
             return toExtract.Substring(0, linkLength);
         }
-
-        private string ReplaceFirst(string searchText, string search, string replace)
-        {
-            var pos = searchText.IndexOf(search);
-            if (pos < 0) return searchText;
-            return searchText.Substring(0, pos) + replace + searchText.Substring(pos + search.Length);
-        }
     }
 }

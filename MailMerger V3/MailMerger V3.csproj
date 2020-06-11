@@ -8,13 +8,13 @@
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MailMerger_V3</RootNamespace>
-    <AssemblyName>MailMerger V3.6.4</AssemblyName>
+    <AssemblyName>MailMerger V3.7</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>D:\System Tools\VS Projects\Published Builds\MailMerger V3.6.4\</PublishUrl>
+    <PublishUrl>D:\System Tools\VS Projects\Published Builds\MailMerger V3.7\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -26,8 +26,8 @@
     <MapFileExtensions>false</MapFileExtensions>
     <TargetCulture>en-GB</TargetCulture>
     <PublisherName>Ryan</PublisherName>
-    <ApplicationRevision>1</ApplicationRevision>
-    <ApplicationVersion>3.6.4.%2a</ApplicationVersion>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>3.7.0.0</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>

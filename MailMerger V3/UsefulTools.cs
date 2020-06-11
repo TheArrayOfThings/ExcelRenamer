@@ -12,7 +12,7 @@ namespace MailMerger_V3
             // Loop through all instances of the string 'text'.
             int count = 0;
             int i = 0;
-            while ((i = text.IndexOf(pattern, i, StringComparison.Ordinal)) != -1)
+            while ((i = text.IndexOf(pattern, i)) != -1)
             {
                 i += pattern.Length;
                 count++;
@@ -38,9 +38,9 @@ namespace MailMerger_V3
         }
         public static string GrabImgSrc(int startIndex, string toGrab)
         {
-            int srcIndex = toGrab.IndexOf("src=", startIndex, StringComparison.Ordinal) + 4;
-            int srcEnd = toGrab.IndexOf("/>", srcIndex, StringComparison.Ordinal);
-            int imgTagLength = (srcEnd - srcIndex) - 2;
+            int srcIndex = toGrab.IndexOf("src=", startIndex) + 5;
+            int srcEnd = toGrab.IndexOf(" />", srcIndex);
+            int imgTagLength = (srcEnd - srcIndex) - 1;
             return toGrab.Substring(srcIndex, imgTagLength);
         }
         public static bool FindMatch(string toCheck, string[] matchArray)
@@ -60,7 +60,7 @@ namespace MailMerger_V3
         }
         public static string ReplaceFirst(string searchText, string search, string replace)
         {
-            int pos = searchText.IndexOf(search, StringComparison.Ordinal);
+            int pos = searchText.IndexOf(search);
             if (pos < 0)
             {
                 return searchText;
@@ -71,12 +71,12 @@ namespace MailMerger_V3
         {
             while (toTrim.Text.EndsWith("\n"))
             {
-                toTrim.Select(toTrim.Text.LastIndexOf("\n", StringComparison.Ordinal), 2);
+                toTrim.Select(toTrim.Text.LastIndexOf("\n"), 2);
                 toTrim.SelectedRtf = "";
             }
             while (toTrim.Text.StartsWith("\n"))
             {
-                toTrim.Select(toTrim.Text.IndexOf("\n", StringComparison.Ordinal), 1);
+                toTrim.Select(toTrim.Text.IndexOf("\n"), 1);
                 toTrim.SelectedRtf = "";
             }
         }
@@ -94,15 +94,15 @@ namespace MailMerger_V3
         }
         public static string GetFontValue(string toParse, string attributeName)
         {
-            int startIndex = toParse.IndexOf(attributeName, StringComparison.Ordinal) + attributeName.Length + 1;
+            int startIndex = toParse.IndexOf(attributeName) + attributeName.Length + 1;
             int endIndex;
-            if (toParse.IndexOf(',', startIndex) == -1)
+            if (toParse.IndexOf(';', startIndex) == -1)
             {
                 endIndex = toParse.Length;
             }
             else
             {
-                endIndex = toParse.IndexOf(',', startIndex);
+                endIndex = toParse.IndexOf(';', startIndex);
             }
             int length = endIndex - startIndex;
             return toParse.Substring(startIndex, length);

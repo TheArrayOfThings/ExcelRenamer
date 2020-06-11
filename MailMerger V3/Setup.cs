@@ -156,7 +156,7 @@ namespace MailMerger_V3
             if (changeFont.ShowDialog() == DialogResult.OK)
             {
                 string fullFont = changeFont.Font.ToString();
-                defaultFontBox.Text = @"Font Name=" + UsefulTools.GetFontValue(fullFont, "Name") + @", Font Size=" + Math.Round(float.Parse(UsefulTools.GetFontValue(fullFont, "Size")));
+                defaultFontBox.Text = @"Font Name=" + UsefulTools.GetFontValue(fullFont, "Name") + @"; Font Size=" + Math.Round(float.Parse(UsefulTools.GetFontValue(fullFont, "Size")));
                 signatureBox.SelectAll();
                 signatureBox.SelectionFont = new Font(UsefulTools.GetFontValue(defaultFontBox.Text, "Name"), float.Parse(UsefulTools.GetFontValue(fullFont, "Size")));
                 signatureBox.Select(0, 0);

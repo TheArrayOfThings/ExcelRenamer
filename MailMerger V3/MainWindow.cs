@@ -56,6 +56,10 @@ namespace MailMerger_V3
         private string _department;
         private string _phoneNumber;
 
+        //Other
+        string bodyFontFamily;
+        string bodyFontSize;
+
         public main()
         {
             InitializeComponent();
@@ -468,20 +472,21 @@ namespace MailMerger_V3
         {
             EmailMessage email = new EmailMessage(_service);
             int lastImgOccurence = 0;
-            string thisBody = "<span style=\"font-family:" + _defaultFont.OriginalFontName + "; font-size:" + _defaultFont.Size + "pt;\">Dear " + recipientData[_forenameColumn] + ",</span>" + "<br/><br/>";
+            //string thisBody = "<span style=\"font-family:" + _defaultFont.OriginalFontName + "; font-size:" + _defaultFont.Size + "pt;\">Dear " + recipientData[_forenameColumn] + ",</span>" + "<br/><br/>";
+            string thisBody = "<span style=\"font-family:" + bodyFontFamily + "; font-size:" + bodyFontSize + ";\">Dear " + recipientData[_forenameColumn] + ",</span>" + "<br/><br/>";
             thisBody += ReplaceMergeFields(_htmlEmailBody, recipientNumber);
             int imageOccurences = UsefulTools.CountStringOccurrences(thisBody, "<img");
             //Attach all images and embed them into html body
             for (int i = 0; i < imageOccurences; ++i)
             {
-                lastImgOccurence = thisBody.IndexOf("<img", lastImgOccurence + 1, StringComparison.Ordinal);
-                string imgSrc = UsefulTools.GrabImgSrc(lastImgOccurence, thisBody);
-                string fileLocation = imgSrc.Substring(1);
-                //_htmlEmailBody = _htmlEmailBody.Replace(imgSRC, "CID:" + fileLocation.Substring(1));
-                email.Attachments.AddFileAttachment(fileLocation);
+                lastImgOccurence = thisBody.IndexOf("<img", lastImgOccurence + 1);
+                string imgLocation = UsefulTools.GrabImgSrc(lastImgOccurence, thisBody);
+                string imgName = imgLocation.Substring(2);
+                thisBody = thisBody.Replace(imgLocation, "cid:" + imgName);
+                email.Attachments.AddFileAttachment(imgName, imgLocation);
                 email.Attachments[i].IsInline = true;
-                email.Attachments[i].ContentId = fileLocation.Substring(1);
-                _toDelete.Add(fileLocation);
+                email.Attachments[i].ContentId = imgName;
+                _toDelete.Add(imgLocation);
             }
             email.Body = thisBody;
             email.Subject = subjectBox.Text;
@@ -567,13 +572,19 @@ namespace MailMerger_V3
             UsefulTools.TrimRtf(bodyBox);
             //Change the font
             bodyBox.SelectAll();
-            /*for (int i = 0; i < bodyBox.TextLength; ++i)
-            {
-                bodyBox.Select(i, 1);
-                bodyBox.SelectionFont = new Font(_defaultFont.FontFamily, _defaultFont.Size);
-            }*/
             //This overwrites bold etc...
-            bodyBox.Font = _defaultFont; 
+            //bodyBox.Font = _defaultFont; 
+            //Grab the font being used by the body
+            bodyFontFamily = UsefulTools.GetFontValue(RtfToHtmlConverter.RtfToHtml(bodyBox.Rtf).Html, "font-family");
+            bodyFontSize = UsefulTools.GetFontValue(RtfToHtmlConverter.RtfToHtml(bodyBox.Rtf).Html, "font-size");
+            //Change the signature to use this font
+            using (RichTextBox tempRichbox = new RichTextBox())
+            {
+                tempRichbox.Rtf = _rtfSignature;
+                tempRichbox.SelectAll();
+                tempRichbox.Font = new Font(bodyFontFamily, float.Parse(bodyFontSize.Replace("pt", "")));
+                _rtfSignature = tempRichbox.Rtf;
+            }
             if (bodyBox.Text.ToLower().Trim().EndsWith("kind regards") || bodyBox.Text.ToLower().Trim().EndsWith("best wishes") || bodyBox.Text.ToLower().Trim().EndsWith("all the best") || bodyBox.Text.ToLower().Trim().EndsWith("best regards") || bodyBox.Text.ToLower().Trim().EndsWith("yours sincerely"))
             {
                 bodyBox.AppendText(Environment.NewLine);
@@ -635,7 +646,9 @@ namespace MailMerger_V3
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show(@"Unrecoverable error: " + e.Message);
+                    MessageBox.Show(@"Unrecoverable error: " + e.Message + "At:" + e.StackTrace);
+                    Application.Exit();
+                    Environment.Exit(0);
                 }
             }
         }
