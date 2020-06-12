@@ -139,12 +139,26 @@ namespace MailMerger_V3
             try
             {
                 Marshal.ReleaseComObject(_importSheet);
+            }
+            catch (Exception)
+            {
+                //Unable to close sheet, but not the biggest issue in the world!
+            }
+            try
+            {
                 Marshal.ReleaseComObject(_importBook);
+            }
+            catch (Exception)
+            {
+                //Unable to close workbook, but not the biggest issue in the world!
+            }
+            try
+            {
                 Marshal.ReleaseComObject(_workbooks);
             }
             catch (Exception)
             {
-                //Unable to close, but not the biggest issue in the world!
+                //Unable to close Excel, but not the biggest issue in the world!
             }
         }
         private void previewButton_Click(object sender, EventArgs e)
@@ -581,18 +595,21 @@ namespace MailMerger_V3
             using (RichTextBox tempRichbox = new RichTextBox())
             {
                 tempRichbox.Rtf = _rtfSignature;
+                if (bodyBox.Text.ToLower().Trim().EndsWith("kind regards") || bodyBox.Text.ToLower().Trim().EndsWith("best wishes") || bodyBox.Text.ToLower().Trim().EndsWith("all the best") || bodyBox.Text.ToLower().Trim().EndsWith("best regards") || bodyBox.Text.ToLower().Trim().EndsWith("yours sincerely"))
+                {
+                    tempRichbox.SelectionStart = 0;
+                    tempRichbox.SelectionLength = 0;
+                    tempRichbox.SelectedText = (Environment.NewLine);
+                }
+                else
+                {
+                    tempRichbox.SelectionStart = 0;
+                    tempRichbox.SelectionLength = 0;
+                    tempRichbox.SelectedText =  (Environment.NewLine + "Kind regards" + Environment.NewLine + Environment.NewLine);
+                }
                 tempRichbox.SelectAll();
                 tempRichbox.Font = new Font(bodyFontFamily, float.Parse(bodyFontSize.Replace("pt", "")));
-                _rtfSignature = tempRichbox.Rtf;
-            }
-            if (bodyBox.Text.ToLower().Trim().EndsWith("kind regards") || bodyBox.Text.ToLower().Trim().EndsWith("best wishes") || bodyBox.Text.ToLower().Trim().EndsWith("all the best") || bodyBox.Text.ToLower().Trim().EndsWith("best regards") || bodyBox.Text.ToLower().Trim().EndsWith("yours sincerely"))
-            {
-                bodyBox.AppendText(Environment.NewLine);
-                parseRtf = bodyBox.Rtf + _rtfSignature;
-            } else
-            {
-                bodyBox.AppendText(Environment.NewLine + Environment.NewLine + "Kind regards" + Environment.NewLine);
-                parseRtf = bodyBox.Rtf + _rtfSignature;
+                parseRtf = bodyBox.Rtf + tempRichbox.Rtf;
             }
             HtmlResult parsedHtml = RtfToHtmlConverter.RtfToHtml(parseRtf);
             parsedHtml.WriteToFile("emailHTML.html");
