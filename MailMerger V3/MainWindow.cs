@@ -4,12 +4,14 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using System.Configuration;
 using Excel = Microsoft.Office.Interop.Excel;
 using Microsoft.Exchange.WebServices.Data;
 using System.Threading;
 using Rtf2Html;
 using System.IO;
 using System.Runtime.InteropServices;
+using Microsoft.Identity.Client;
 
 namespace MailMerger_V3
 {
@@ -49,8 +51,7 @@ namespace MailMerger_V3
         //bool signatureContainsSignoff = false;
 
         //User info
-        private readonly string _userEmailAddress;
-        private readonly string _userPassword;
+        private string _userEmailAddress;
         private string _firstName;
         private string _jobTitle;
         private string _department;
@@ -63,33 +64,15 @@ namespace MailMerger_V3
         public main()
         {
             InitializeComponent();
-            //Get user credentials
-            UserLogin loginForm = new UserLogin();
-            loginForm.ShowDialog();
-            //Close if not provided
-            if (loginForm.DialogResult == DialogResult.OK)
-            {
-                _userEmailAddress = loginForm.UserEmail;
-                _userPassword = loginForm.UserPassword;
-            }
-            else
-            {
-                Application.Exit();
-                Environment.Exit(0);
-            }
 
             logBox.SelectAll();
             logBox.SelectionAlignment = HorizontalAlignment.Center;
-            //Get the email address
-            inboxes.Items.Add(_userEmailAddress);
+            
             //EWS setup
             _service.UseDefaultCredentials = false;
-            _service.Credentials = new WebCredentials(_userEmailAddress, _userPassword);
-            Thread startAutoDiscover = new Thread(AutoDiscoverThread)
-            {
-                IsBackground = true
-            };
-            startAutoDiscover.Start();
+
+            IdentityService();
+
             if (File.Exists("Settings.txt"))
             {
                 ImportSettings();
@@ -448,6 +431,40 @@ namespace MailMerger_V3
             }
             emailBox.Text = AllData[toDisplay + 1][_emailColumn];
         }
+
+        public async void IdentityService()
+        {
+            
+            // Using Microsoft.Identity.Client 4.22.0
+
+            // Configure the MSAL client to get tokens
+            var pcaOptions = new PublicClientApplicationOptions
+            {
+                ClientId = ConfigurationManager.AppSettings["appId"],
+                TenantId = ConfigurationManager.AppSettings["tenantId"],
+                RedirectUri = ConfigurationManager.AppSettings["redirectURI"]
+            };
+
+            var pca = PublicClientApplicationBuilder
+                .CreateWithApplicationOptions(pcaOptions).Build();
+
+            // The permission scope required for EWS access
+            var ewsScopes = new string[] { "https://outlook.office365.com/EWS.AccessAsUser.All" };
+
+            // Make the interactive token request
+            var authResult = await pca.AcquireTokenInteractive(ewsScopes).ExecuteAsync();
+
+            _service.Credentials = new OAuthCredentials(authResult.AccessToken);
+            _userEmailAddress = authResult.Account.Username;
+
+            Thread startAutoDiscover = new Thread(AutoDiscoverThread)
+
+            {
+                IsBackground = true
+            };
+            startAutoDiscover.Start();
+        }
+
         private void AutoDiscoverThread()
         {
             try
@@ -456,8 +473,25 @@ namespace MailMerger_V3
                 {
                     Thread.Sleep(500);
                 }
-                _service.AutodiscoverUrl(_userEmailAddress, autoDiscoverOverload);
+                //MessageBox.Show(@"Email address detected as " + _userEmailAddress);
+                //_service.AutodiscoverUrl(_userEmailAddress, autoDiscoverOverload);
+                //MessageBox.Show(@"URI is: " + _service.Url);
+                //Console.WriteLine(@"URI is: " + _service.Url);
+                _service.Url = new Uri("https://taw.bournemouth.ac.uk/ews/exchange.asmx");
+                try
+                {
+                    FindFoldersResults findFolderResults = _service.FindFolders(WellKnownFolderName.Root, new SearchFilter.IsGreaterThan(FolderSchema.TotalCount, 0), new FolderView(10));
+                } catch (Exception uriInvalid)
+                {
+                    _service.Url = new Uri("https://outlook.office365.com/EWS/Exchange.asmx");
+                    FindFoldersResults findFolderResults = _service.FindFolders(WellKnownFolderName.Root, new SearchFilter.IsGreaterThan(FolderSchema.TotalCount, 0), new FolderView(10));
+                }
+
                 _autoDiscoverFinished = true;
+                inboxes.BeginInvoke((MethodInvoker)delegate ()
+                {
+                    inboxes.Items.Add(_userEmailAddress);
+                });
                 MessageBox.Show(@"Finished configuring your Exchange profile.");
             }
             catch (Exception e)
